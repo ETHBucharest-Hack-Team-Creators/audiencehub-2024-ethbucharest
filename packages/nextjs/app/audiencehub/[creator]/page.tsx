@@ -1,67 +1,113 @@
 "use client";
 
-import { useEffect } from "react";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { getTransactionReceipt } from "viem/_types/actions/public/getTransactionReceipt";
+import { waitForTransactionReceipt } from "viem/_types/actions/public/waitForTransactionReceipt";
 import { useAccount } from "wagmi";
 import ApproveToken from "~~/components/ApproveToken";
 import { BlockieAvatar } from "~~/components/scaffold-eth";
-import { useScaffoldContractRead, useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
-
+import { useScaffoldContractRead, useScaffoldContractWrite, useScaffoldEventSubscriber } from "~~/hooks/scaffold-eth";
+import  { useRouter } from "next/navigation";
+import { notification } from "~~/utils/scaffold-eth";
 
 export default function Page({ params }: { params: { creator: string } }) {
-
-
+  const [streamId, setStreamId] = useState("") as any;
+  const [streamOwner, setStreamOwner] = useState("") as any;
+  const [isStreamOwner, setIsStreamOnwer] = useState(false) as any;
   const price = 10000000000000000;
-
-    const {address} = useAccount();
-
+  const router = useRouter() as any;
+  const { address } = useAccount();
 
   useEffect(() => {
     console.log(params);
   }, []);
 
-  
-const sablier_Address = "0x7a43F8a888fa15e68C103E18b0439Eb1e98E4301"
+  const sablier_Address = "0x7a43F8a888fa15e68C103E18b0439Eb1e98E4301";
 
-
-//check for allownce of dai
+  //check for allownce of dai
   const { data: connectedAddressCounter } = useScaffoldContractRead({
     contractName: "DAI",
     functionName: "allowance",
     args: [address, sablier_Address],
-    watch: true
+    watch: true,
   });
 
-  //check for nft ownership
+  //check for NFT STREAM SENDER as USER ownership
+
   const { data: isOwner } = useScaffoldContractRead({
-    contractName: "DAI",
-    functionName: "allowance",
-    args: [address, sablier_Address],
-    watch: true
+    contractName: "Sablier",
+    functionName: "getSender",
+    args: [streamId],
+    watch: true,
   });
 
 
-//create stream
-  const { writeAsync, isLoading, isMining } = useScaffoldContractWrite({
 
+ 
+  //create stream
+  const { writeAsync, isLoading, isMining } = useScaffoldContractWrite({
     contractName: "Sablier",
     functionName: "createWithDurations",
 
-  args: [[address, "0x64336a17003cDCcde3cebEcff1CDEc2f9AeEdB7d", price, "0x776b6fC2eD15D6Bb5Fc32e0c89DE68683118c62A", true, true, [0,2592000], ["0x0000000000000000000000000000000000000000",0]]],
+    args: [
+      [
+        address,
+        "0x64336a17003cDCcde3cebEcff1CDEc2f9AeEdB7d",
+        price,
+        "0x776b6fC2eD15D6Bb5Fc32e0c89DE68683118c62A",
+        true,
+        true,
+        [0, 2592000],
+        ["0x0000000000000000000000000000000000000000", 0],
+      ],
+    ],
     blockConfirmations: 1,
     onBlockConfirmation: txnReceipt => {
       console.log("Transaction blockHash", txnReceipt.blockHash);
     },
+    onSettled(data, error) {
+      console.log("Settled", { data, error });
+    },
   });
 
+  // check for event
+  useScaffoldEventSubscriber({
+    contractName: "Sablier",
+    eventName: "CreateLockupLinearStream",
+    // The listener function is called whenever a GreetingChange event is emitted by the contract.
+    // Parameters emitted by the event can be destructed using the below example
+    // for this example: event GreetingChange(address greetingSetter, string newGreeting, bool premium, uint256 value);
+    listener: logs => {
+      logs.map(log => {
+        const args = log.args;
+        const sender = log.args[0];
+        if (sender === address) {
+          var StreamIdString = parseFloat(log.args[3] as string); // or parseInt(str) if you want an integer
+
+          setStreamId(StreamIdString);
+          setStreamOwner(address);
 
 
+          console.log("Sender", true);
 
+          
+          //post stream id here in database
 
+          //redirect to creatorpage
+          notification.success("Subscription created, redirecting to creator content")
 
-
-
-
-  
+          //replace with new url on deployment
+           router.push(`http://localhost:3000/audiencehub/creator-content/${params.creator}`);
+        
+          //we check if they are subscriberd, if yes show if no dont show
+        }
+        const streamId = log.args[3];
+        console.log("Event emitted ", args);
+        console.log("StreamId : ", streamId);
+      });
+    },
+  });
 
   return (
     <>
@@ -72,11 +118,35 @@ const sablier_Address = "0x7a43F8a888fa15e68C103E18b0439Eb1e98E4301"
           </div>
         </div>
         <div className="flex justify-center mt-5 font-bold">{params.creator} </div>
-        
-        <p>{connectedAddressCounter && connectedAddressCounter > price  ? 
-        <button className="btn btn-wide flex justify-center mt-2 btn-primary text-white text-xl" onClick={() => writeAsync()}>Subscribe </button>
-        :   <ApproveToken /> }</p>
-     
+
+        {streamOwner !== false && (
+          <div>
+            {connectedAddressCounter && connectedAddressCounter > price ? (
+              <button
+                className="btn btn-wide flex justify-center mt-2 btn-primary text-white text-xl"
+                onClick={() => writeAsync()}
+              >
+                Subscribe{" "}
+              </button>
+            ) : (
+              <ApproveToken />
+            )}
+          </div>
+        )}
+
+
+        {
+         isStreamOwner && (
+          <div>
+            <Link href={"/"}>
+              <button className="btn btn-wide flex justify-center mt-2 btn-primary text-white text-xl"> Go To Creator Content </button>
+            </Link>
+          </div>
+         )
+
+        }
+
+        <div></div>
       </div>
     </>
   );
