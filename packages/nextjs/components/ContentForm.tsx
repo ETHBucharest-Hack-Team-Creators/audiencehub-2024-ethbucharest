@@ -62,7 +62,7 @@ const ContentForm = () => {
           </span>
           <textarea
             className="textarea rounded-3xl"
-            placeholder="Insert a description of your content"
+            placeholder="Insert a description or a link of your content"
             value={description}
             onChange={e => setDescription(e.target.value)}
           />
@@ -77,7 +77,7 @@ const ContentForm = () => {
             onChange={e => setPicture(e.target.files ? e.target.files[0] : null)}
           />
         </div>
-        <div className="pt-20">
+        <div className="pt-36">
           <button onClick={handleSubmit} className="btn btn-primary w-full max-w-xs rounded-3xl">
             Submit
           </button>
