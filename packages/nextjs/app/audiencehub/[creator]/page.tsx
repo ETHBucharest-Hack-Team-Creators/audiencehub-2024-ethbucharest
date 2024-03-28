@@ -2,8 +2,9 @@
 
 import { useEffect } from "react";
 import { useAccount } from "wagmi";
+import ApproveToken from "~~/components/ApproveToken";
 import { BlockieAvatar } from "~~/components/scaffold-eth";
-import { useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
+import { useScaffoldContractRead, useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
 
 
 export default function Page({ params }: { params: { creator: string } }) {
@@ -15,18 +16,33 @@ export default function Page({ params }: { params: { creator: string } }) {
     console.log(params);
   }, []);
 
+  
+const sablier_Address = "0x7a43F8a888fa15e68C103E18b0439Eb1e98E4301"
+
+
+
 
   const { writeAsync, isLoading, isMining } = useScaffoldContractWrite({
+
     contractName: "Sablier",
     functionName: "createWithDurations",
 
-  args: [[address, "0x64336a17003cDCcde3cebEcff1CDEc2f9AeEdB7d", 10000000000000000000, "0x776b6fC2eD15D6Bb5Fc32e0c89DE68683118c62A", true, true, [0,3600], [0x0000000000000000000000000000000000000000,0]]],
+  args: [[address, "0x64336a17003cDCcde3cebEcff1CDEc2f9AeEdB7d", 10000000000000000, "0x776b6fC2eD15D6Bb5Fc32e0c89DE68683118c62A", true, true, [0,3600], ["0x0000000000000000000000000000000000000000",0]]],
     blockConfirmations: 1,
     onBlockConfirmation: txnReceipt => {
       console.log("Transaction blockHash", txnReceipt.blockHash);
     },
   });
 
+
+
+
+
+
+
+
+
+  
 
   return (
     <>
@@ -37,7 +53,9 @@ export default function Page({ params }: { params: { creator: string } }) {
           </div>
         </div>
         <div className="flex justify-center mt-5 font-bold">{params.creator} </div>
-        <button className="btn btn-wide flex justify-center mt-2 btn-primary text-white text-xl" onClick={() => writeAsync()}>Subscribe</button>
+        <button className="btn btn-wide flex justify-center mt-2 btn-primary text-white text-xl" onClick={() => writeAsync()}>Subscribe </button>
+
+        <ApproveToken />
       </div>
     </>
   );

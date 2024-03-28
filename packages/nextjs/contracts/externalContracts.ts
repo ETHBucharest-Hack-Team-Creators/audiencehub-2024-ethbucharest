@@ -1,5 +1,6 @@
 import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 import sablierabi from '../abi/sablierLinear.json';
+import daiabi from '../abi/dai.json';
 
 /**
  * @example
@@ -23,7 +24,7 @@ import sablierabi from '../abi/sablierLinear.json';
      },
      DAI: {
       address: '0x776b6fC2eD15D6Bb5Fc32e0c89DE68683118c62A',
-      abi: ''
+      abi: daiabi
      },
    },
  } as const;
