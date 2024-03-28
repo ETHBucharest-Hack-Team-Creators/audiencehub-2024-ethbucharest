@@ -1,10 +1,48 @@
 import { parseUnits } from 'ethers/lib/utils';
+import { useEffect } from 'react';
+import { waitForTransaction } from '@wagmi/core'
+import { notification } from '~~/utils/scaffold-eth';
 
-const ShopItem = ({ createRequest, sendTransaction, address }: any) => {
+
+const ShopItem = ({ createRequest, sendTransaction, address, isTxSuccess, isTxError, requestDataProps, addressOfUser, hash }: any) => {
+
+  function delay(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  useEffect(() => {
+  console.log(requestDataProps)
+  },[requestDataProps])
+
+
   const handleClick = async () => {
     await createRequest();
-    sendTransaction({ to: address as string, value: parseUnits("0.005", 18) });
-  };
+   
+ 
+
+    
+  // if(isTxError) {
+  //   console.log('tx error')
+  // } else {
+
+
+
+
+  // }
+  }
+
+  // useEffect(async () => {
+  //   let declaredPayment;
+  //   declaredPayment = notification.loading("Declaring sent payment");
+
+  //  await requestDataProps.declareSentPayment('10', 'sent payment', {
+  //     type: "ethereumAddress" as any,
+  //     value: address as string,
+  //   })
+  //   notification.remove(declaredPayment);
+  //   notification.success("Payment declared successfully")
+  //   },[requestDataProps])
+  
 
   return (
 <div className="card w-72 bg-base-100 shadow-xl mx-5">

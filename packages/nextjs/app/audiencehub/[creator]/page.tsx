@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getTransactionReceipt } from "viem/_types/actions/public/getTransactionReceipt";
 import { waitForTransactionReceipt } from "viem/_types/actions/public/waitForTransactionReceipt";
-import { useAccount } from "wagmi";
+import { useAccount, useWaitForTransaction } from "wagmi";
 import ApproveToken from "~~/components/ApproveToken";
 import { BlockieAvatar } from "~~/components/scaffold-eth";
 import { useScaffoldContractRead, useScaffoldContractWrite, useScaffoldEventSubscriber } from "~~/hooks/scaffold-eth";
@@ -22,12 +22,21 @@ import { Web3SignatureProvider } from "@requestnetwork/web3-signature";
 import ShopItem from "~~/components/ShopItem";
 
 export default function Page({ params }: { params: { creator: string } }) {
+
+//HANDLE BUTTON PAY SUBSCRIPTION
+//HANDLE BUTTON PAY ONE TIME ITEM
+//POST REQUEST ID TO DATABASE IF SUCCESS WITH THE CORESPONDENT DATA 
+
+
   const [streamId, setStreamId] = useState("") as any;
   const [streamOwner, setStreamOwner] = useState("") as any;
   const [isStreamOwner, setIsStreamOnwer] = useState(false) as any;
+  const [requestDataProps, setRequestDataProps] = useState({} as any);
   const price = 10000000000000000;
   const router = useRouter() as any;
-
+  function delay(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
 
   enum APP_STATUS {
     AWAITING_INPUT = "awaiting input",
@@ -40,12 +49,18 @@ export default function Page({ params }: { params: { creator: string } }) {
 
   const { 
     data: hash, 
-    // isLoading, 
+    isLoading, 
     isSuccess,
-    sendTransaction 
-  } = useSendTransaction() 
+    isError,
+    
+    sendTransaction,
+    sendTransactionAsync, 
 
-  const { data: walletClient, isError } = useWalletClient();
+   
+  } = useSendTransaction();
+
+
+  const { data: walletClient } = useWalletClient();
   const [currency, setCurrency] = useState(currencies.keys().next().value);
   const [expectedAmount, setExpectedAmount] = useState("");
 
@@ -57,7 +72,7 @@ export default function Page({ params }: { params: { creator: string } }) {
   const [requestData, setRequestData] =
     useState<Types.IRequestDataWithEvents>();
 //IT'S ABOUT PROVIDER
-
+//AMOUNT IS 10 DAI , TO MODIFY WITH PARAMETERS
 
 
   const {address} = useAccount()
@@ -91,6 +106,7 @@ async function createRequest() {
         value: "0x776b6fC2eD15D6Bb5Fc32e0c89DE68683118c62A",
         network: "sepolia",
       },
+      //PRICE VARIABLE
       expectedAmount: parseUnits(
    `10`,
         18
@@ -137,6 +153,8 @@ async function createRequest() {
     const request = await requestClient.createRequest(
       requestCreateParameters,
     );
+
+  
     notification.remove(notificationId);
    const nofiticationIdPersisting = notification.loading("  Persisting on chain")
     setStatus(APP_STATUS.PERSISTING_ON_CHAIN);
@@ -145,7 +163,34 @@ async function createRequest() {
     notification.remove(nofiticationIdPersisting);
     notification.success(" Request confirmed")
     setStatus(APP_STATUS.REQUEST_CONFIRMED);
+    setRequestDataProps(request);
     setRequestData(confirmedRequestData);
+    
+    let notificationSendTx;
+    notificationSendTx = notification.loading("Sending Transaction");
+ 
+
+    //PRICE VARIABLE
+    sendTransactionAsync({ to: address as string, value: parseUnits("0.0005", 18) });
+     
+  
+   notification.remove(notificationSendTx);
+    
+   await delay(2000);
+   if(!isLoading && !isError) {
+
+   let notificationLoadingDeclaring;
+   notificationLoadingDeclaring = notification.loading("Declaring sent payment");
+   notification.remove(notificationLoadingDeclaring);
+
+
+    await request.declareSentPayment('10', 'sent payment', {
+      type: "ethereumAddress" as any,
+      value: address as string,
+    })
+    notification.success("Payment declared successfully")
+  }
+
   } catch (err) {
     alert("Error occurred")
     setStatus(APP_STATUS.ERROR_OCCURRED);
@@ -155,40 +200,10 @@ async function createRequest() {
 
 useEffect(() => {
   isSuccess && notification.success(`Transaction buying success`);
+  isError && notification.error(`Transaction buying failed`);
 }, [isSuccess])
 
-function canSubmit() {
-  return (
-    status !== APP_STATUS.SUBMITTING &&
-    !isError &&
-    !isLoading &&
-    storageChain.length > 0 &&
-    // Payment Recipient is empty || isAddress
-    (paymentRecipient.length === 0 ||
-      (paymentRecipient.startsWith("0x") &&
-        paymentRecipient.length === 42)) &&
-    // Payer is empty || isAddress
-    (payerIdentity && payerIdentity.length === 0 ||
-      (payerIdentity && payerIdentity.startsWith("0x") && payerIdentity.length === 42)) &&
-    expectedAmount.length > 0 &&
-    currency.length > 0
-  );
-}
 
-async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-  e.preventDefault();
-  // if (!canSubmit()) {
-  //   return;
-  // }
-  setRequestData(undefined);
-  setStatus(APP_STATUS.SUBMITTING);
-  // await createRequest();
-}
-
-function handleClear(_: React.MouseEvent<HTMLButtonElement>) {
-  setRequestData(undefined);
-  setStatus(APP_STATUS.AWAITING_INPUT);
-}
 
 
 
@@ -206,20 +221,20 @@ function handleClear(_: React.MouseEvent<HTMLButtonElement>) {
     watch: true,
   });
 
-  //check for NFT STREAM SENDER as USER ownership
+  // check for NFT STREAM SENDER as USER ownership
 
-  // const { data: isOwner } = useScaffoldContractRead({
-  //   contractName: "Sablier",
-  //   functionName: "getSender",
-  //   args: [streamId],
-  //   watch: true,
-  // });
+  const { data: isOwner } = useScaffoldContractRead({
+    contractName: "Sablier",
+    functionName: "getSender",
+    args: [streamId],
+    watch: true,
+  });
 
 
 
  
   //create stream
-  const { writeAsync, isLoading, isMining } = useScaffoldContractWrite({
+  const { writeAsync, isMining } = useScaffoldContractWrite({
     contractName: "Sablier",
     functionName: "createWithDurations",
 
@@ -318,57 +333,18 @@ function handleClear(_: React.MouseEvent<HTMLButtonElement>) {
          )
 
         }
+        
+
+        
 
         <div className="grid grid-cols-1 items-center align-middle">
           <div className="flex justify-center mt-5 font-bold">Merch & Items </div>
           <div className="grid grid-cols-4 space-x-auto  mt-5">
-          <div className="card w-72 bg-base-100 shadow-xl mx-5">
-  <figure className="px-10 pt-10">
-    <img src="https://daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.jpg" alt="Shoes" className="rounded-xl" />
-  </figure>
-  <div className="card-body items-center text-center">
-    <h2 className="card-title">Shoes!</h2>
-    <p>If a dog chews shoes whose shoes does he choose?</p>
-    <div className="card-actions">
-      <button className="btn btn-primary">Buy Now</button>
-    </div>
-  </div>
-</div>
-<div className="card w-72 bg-base-100 shadow-xl mx-5">
-  <figure className="px-10 pt-10">
-    <img src="https://daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.jpg" alt="Shoes" className="rounded-xl" />
-  </figure>
-  <div className="card-body items-center text-center">
-    <h2 className="card-title">Shoes!</h2>
-    <p>If a dog chews shoes whose shoes does he choose?</p>
-    <div className="card-actions">
-      <button className="btn btn-primary">Buy Now</button>
-    </div>
-  </div>
-</div>
-<ShopItem createRequest={createRequest} sendTransaction={sendTransaction} address={address} />
-<div className="card w-72 bg-base-100 shadow-xl mx-5">
-  <figure className="px-10 pt-10">
-    <img src="https://daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.jpg" alt="Shoes" className="rounded-xl" />
-  </figure>
-  <div className="card-body items-center text-center">
-    <h2 className="card-title">Shoes!</h2>
-    <p>If a dog chews shoes whose shoes does he choose?</p>
-    <div className="card-actions">
-      <button className="btn btn-primary" 
-      onClick={async () => {
-        await createRequest();
-      
-         sendTransaction({ to: address as string, value: parseUnits("0.005", 18) })
-       
-
-
-      }}
-      >Request</button>
-    {/* <pre>{JSON.stringify(requestData, undefined, 2)}</pre> */}
-    </div>
-  </div>
-</div>
+           {/* //.map, with fetched data, price, image, name, description  */}
+<ShopItem createRequest={createRequest} />
+<ShopItem createRequest={createRequest} />
+<ShopItem createRequest={createRequest} />
+<ShopItem createRequest={createRequest} />
 
           </div>
         </div>
