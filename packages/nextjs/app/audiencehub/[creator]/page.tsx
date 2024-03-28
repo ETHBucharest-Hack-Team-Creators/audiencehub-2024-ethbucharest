@@ -4,20 +4,208 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getTransactionReceipt } from "viem/_types/actions/public/getTransactionReceipt";
 import { waitForTransactionReceipt } from "viem/_types/actions/public/waitForTransactionReceipt";
-import { useAccount } from "wagmi";
+import { useAccount, useWaitForTransaction } from "wagmi";
 import ApproveToken from "~~/components/ApproveToken";
 import { BlockieAvatar } from "~~/components/scaffold-eth";
 import { useScaffoldContractRead, useScaffoldContractWrite, useScaffoldEventSubscriber } from "~~/hooks/scaffold-eth";
 import  { useRouter } from "next/navigation";
 import { notification } from "~~/utils/scaffold-eth";
+import { BuyNow } from "~~/components/BuyNow";
+import { RequestNetwork, Types, Utils } from "@requestnetwork/request-client.js";
+import { currencies } from "~~/config/currency";
+import { storageChains } from "~~/config/storage-chains";
+import { useWalletClient } from "wagmi";
+import { providers } from "ethers";
+import { useSendTransaction } from "wagmi";
+import { parseUnits, zeroAddress } from 'viem';
+import { Web3SignatureProvider } from "@requestnetwork/web3-signature";
+import ShopItem from "~~/components/ShopItem";
 
 export default function Page({ params }: { params: { creator: string } }) {
+
+//HANDLE BUTTON PAY SUBSCRIPTION
+//HANDLE BUTTON PAY ONE TIME ITEM
+//POST REQUEST ID TO DATABASE IF SUCCESS WITH THE CORESPONDENT DATA 
+
+
   const [streamId, setStreamId] = useState("") as any;
   const [streamOwner, setStreamOwner] = useState("") as any;
   const [isStreamOwner, setIsStreamOnwer] = useState(false) as any;
+  const [requestDataProps, setRequestDataProps] = useState({} as any);
   const price = 10000000000000000;
   const router = useRouter() as any;
-  const { address } = useAccount();
+  function delay(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  enum APP_STATUS {
+    AWAITING_INPUT = "awaiting input",
+    SUBMITTING = "submitting",
+    PERSISTING_TO_IPFS = "persisting to ipfs",
+    PERSISTING_ON_CHAIN = "persisting on-chain",
+    REQUEST_CONFIRMED = "request confirmed",
+    ERROR_OCCURRED = "error occurred",
+  }
+
+  const { 
+    data: hash, 
+    isLoading, 
+    isSuccess,
+    isError,
+    
+    sendTransaction,
+    sendTransactionAsync, 
+
+   
+  } = useSendTransaction();
+
+
+  const { data: walletClient } = useWalletClient();
+  const [currency, setCurrency] = useState(currencies.keys().next().value);
+  const [expectedAmount, setExpectedAmount] = useState("");
+
+  const [status, setStatus] = useState(APP_STATUS.AWAITING_INPUT);
+  const [storageChain, setStorageChain] = useState(
+    storageChains.keys().next().value,
+  );
+
+  const [requestData, setRequestData] =
+    useState<Types.IRequestDataWithEvents>();
+//IT'S ABOUT PROVIDER
+//AMOUNT IS 10 DAI , TO MODIFY WITH PARAMETERS
+
+
+  const {address} = useAccount()
+
+
+
+
+
+  const payeeIdentity = address as string;
+const payerIdentity = address;
+const paymentRecipient = payeeIdentity;
+const feeRecipient = '0x0000000000000000000000000000000000000000';
+
+
+
+async function createRequest() {
+  const signatureProvider = new Web3SignatureProvider(walletClient);
+  const requestClient = new RequestNetwork({
+    nodeConnectionConfig: {
+      baseURL: storageChains.get(storageChain)!.gateway,
+    },
+    signatureProvider,
+    // httpConfig: {
+    //   getConfirmationMaxRetry: 40, // timeout after 120 seconds
+    // },
+  });
+  const requestCreateParameters: Types.ICreateRequestParameters = {
+    requestInfo: {
+      currency: {
+        type: Types.RequestLogic.CURRENCY.ERC20,
+        value: "0x776b6fC2eD15D6Bb5Fc32e0c89DE68683118c62A",
+        network: "sepolia",
+      },
+      //PRICE VARIABLE
+      expectedAmount: parseUnits(
+   `10`,
+        18
+      ).toString(),
+      payee: {
+        type: Types.Identity.TYPE.ETHEREUM_ADDRESS,
+        value: address as string,
+      },
+      timestamp: Utils.getCurrentTimestampInSecond(),
+    },
+    paymentNetwork: {
+      id: Types.Extension.PAYMENT_NETWORK_ID.ERC20_FEE_PROXY_CONTRACT,
+      parameters: {
+        paymentNetworkName: "sepolia",
+        paymentAddress: paymentRecipient || address,
+        feeAddress: zeroAddress,
+        feeAmount: "0",
+      },
+    },
+    contentData: {
+      // Consider using rnf_invoice format from @requestnetwork/data-format package.
+      reason: "bought",
+      dueDate: "12.12.2039",
+      builderId: "request-network",
+      createdWith: "CodeSandBox",
+    },
+    signer: {
+      type: Types.Identity.TYPE.ETHEREUM_ADDRESS,
+      value: address as string,
+    },
+  };
+
+  if (payerIdentity && payerIdentity.length > 0) {
+    requestCreateParameters.requestInfo.payer = {
+      type: Types.Identity.TYPE.ETHEREUM_ADDRESS,
+      value: payerIdentity,
+    };
+  }
+
+  try {
+    let notificationId = null;
+    setStatus(APP_STATUS.PERSISTING_TO_IPFS);
+  notificationId = notification.loading("Persisting to IPFS")
+    const request = await requestClient.createRequest(
+      requestCreateParameters,
+    );
+
+  
+    notification.remove(notificationId);
+   const nofiticationIdPersisting = notification.loading("  Persisting on chain")
+    setStatus(APP_STATUS.PERSISTING_ON_CHAIN);
+    setRequestData(request.getData());
+    const confirmedRequestData = await request.waitForConfirmation();
+    notification.remove(nofiticationIdPersisting);
+    notification.success(" Request confirmed")
+    setStatus(APP_STATUS.REQUEST_CONFIRMED);
+    setRequestDataProps(request);
+    setRequestData(confirmedRequestData);
+    
+    let notificationSendTx;
+    notificationSendTx = notification.loading("Sending Transaction");
+ 
+
+    //PRICE VARIABLE
+    sendTransactionAsync({ to: address as string, value: parseUnits("0.0005", 18) });
+     
+  
+   notification.remove(notificationSendTx);
+    
+   await delay(2000);
+   if(!isLoading && !isError) {
+
+   let notificationLoadingDeclaring;
+   notificationLoadingDeclaring = notification.loading("Declaring sent payment");
+   notification.remove(notificationLoadingDeclaring);
+
+
+    await request.declareSentPayment('10', 'sent payment', {
+      type: "ethereumAddress" as any,
+      value: address as string,
+    })
+    notification.success("Payment declared successfully")
+  }
+
+  } catch (err) {
+    alert("Error occurred")
+    setStatus(APP_STATUS.ERROR_OCCURRED);
+    alert(err);
+  }
+}
+
+useEffect(() => {
+  isSuccess && notification.success(`Transaction buying success`);
+  isError && notification.error(`Transaction buying failed`);
+}, [isSuccess])
+
+
+
+
 
   useEffect(() => {
     console.log(params);
@@ -33,7 +221,7 @@ export default function Page({ params }: { params: { creator: string } }) {
     watch: true,
   });
 
-  //check for NFT STREAM SENDER as USER ownership
+  // check for NFT STREAM SENDER as USER ownership
 
   const { data: isOwner } = useScaffoldContractRead({
     contractName: "Sablier",
@@ -46,7 +234,7 @@ export default function Page({ params }: { params: { creator: string } }) {
 
  
   //create stream
-  const { writeAsync, isLoading, isMining } = useScaffoldContractWrite({
+  const { writeAsync, isMining } = useScaffoldContractWrite({
     contractName: "Sablier",
     functionName: "createWithDurations",
 
@@ -145,8 +333,21 @@ export default function Page({ params }: { params: { creator: string } }) {
          )
 
         }
+        
 
-        <div></div>
+        
+
+        <div className="grid grid-cols-1 items-center align-middle">
+          <div className="flex justify-center mt-5 font-bold">Merch & Items </div>
+          <div className="grid grid-cols-4 space-x-auto  mt-5">
+           {/* //.map, with fetched data, price, image, name, description  */}
+<ShopItem createRequest={createRequest} />
+<ShopItem createRequest={createRequest} />
+<ShopItem createRequest={createRequest} />
+<ShopItem createRequest={createRequest} />
+
+          </div>
+        </div>
       </div>
     </>
   );
