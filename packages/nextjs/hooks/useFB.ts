@@ -12,7 +12,7 @@ import {
   updateDoc,
   where,
 } from "firebase/firestore";
-import { type FirebaseStorage, getStorage } from "firebase/storage";
+import { type FirebaseStorage, getDownloadURL, getStorage, ref, uploadBytes  } from "firebase/storage";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -164,6 +164,17 @@ export function useFB() {
     return contents;
   };
 
+  // IMAGE
+  const uploadImages = async (files: File[]) => {
+    const uploadPromises = files.map((file: File) => {
+      if (!storage) return;
+      const fileRef = ref(storage, `uploads/${file.name}`);
+      return uploadBytes(fileRef, file).then(snapshot => getDownloadURL(snapshot.ref));
+    });
+    const downloadUrls = await Promise.all(uploadPromises);
+    return downloadUrls;
+  };
+
   return {
     db,
     storage,
@@ -178,5 +189,7 @@ export function useFB() {
 
     postOneItem,
     getItems,
+
+    uploadImages,
   };
 }
