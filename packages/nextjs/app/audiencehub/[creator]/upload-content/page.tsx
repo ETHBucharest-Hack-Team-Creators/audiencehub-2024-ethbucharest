@@ -1,7 +1,6 @@
 "use client";
 
 import React, { ChangeEvent, FormEvent, useState } from "react";
-import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { useAccount } from "wagmi";
 import { useFB } from "~~/hooks/useFB";
 
@@ -11,7 +10,7 @@ export default function Page({ params }: { params: { creator: string } }) {
   const [uploadStatus, setUploadStatus] = useState<string>("");
 
   const { address } = useAccount();
-  const { postContent, storage } = useFB();
+  const { postContent, uploadImages } = useFB();
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
@@ -30,13 +29,7 @@ export default function Page({ params }: { params: { creator: string } }) {
     if (!address || !content) return;
 
     try {
-      const uploadPromises = files.map((file: File) => {
-        if (!storage) return;
-        const fileRef = ref(storage, `uploads/${file.name}`);
-        return uploadBytes(fileRef, file).then(snapshot => getDownloadURL(snapshot.ref));
-      });
-      const downloadUrls = await Promise.all(uploadPromises);
-      console.log(downloadUrls);
+      const downloadUrls = await uploadImages(files);
 
       console.log("Files uploaded:", downloadUrls);
       setUploadStatus("Upload complete!");
