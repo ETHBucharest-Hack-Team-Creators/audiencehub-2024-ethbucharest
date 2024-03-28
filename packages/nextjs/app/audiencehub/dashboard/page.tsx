@@ -1,10 +1,108 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
-
+import { RequestNetwork } from "@requestnetwork/request-client.js";
+import { useWalletClient } from "wagmi";
+import { Web3SignatureProvider } from "@requestnetwork/web3-signature";
+import { storageChains } from "~~/config/storage-chains";
+import {providers} from "ethers";
 const Page = () => {
-  const [userType, setUserType] = React.useState("fan");
+  //mock array of request IDs
+  //Fetch request IDs from db, query user's address
+  const requestIds = [
+    "011c99c877b6fe4e8b953523c407f85568cc884a3e68cbab47b1a033a2895ec9e9",
+    "01b451e626efc609cc07fbb96d68aca853dcb9dcb72d6d8acad04f2fb83b2afabb",
+    "0196f638f5f320dd7eb600b1d5d9edd242d29281f5cdee815b29783baa542f3b26",
+  ];
+
+  const [userType, setUserType] = useState("fan");
+  const [requestsData, setRequestsData] = useState([]);
+  const [storageChain, setStorageChain] = useState(
+    storageChains.keys().next().value,
+  );
+
+  const { data: walletClient } = useWalletClient();
+
+
+  // get request Ids from database (subscriptions, array of request ids)
+  async function getRequestIds() {
+    let provider;
+    if (process.env.WEB3_PROVIDER_URL === undefined) {
+      // Connect to Metamask and other injected wallets
+      provider = new providers.Web3Provider(window.ethereum as any);
+    } else {
+      // Connect to your own Ethereum node or 3rd party node provider
+      provider = new providers.JsonRpcProvider(process.env.WEB3_PROVIDER_URL);
+    }
+
+
+    console.log(walletClient)
+    const signatureProvider = new Web3SignatureProvider(provider);
+    const requestClient = new RequestNetwork({
+      nodeConnectionConfig: {
+        baseURL: storageChains.get(storageChain)!.gateway,
+      },
+      signatureProvider,
+      // httpConfig: {
+      //   getConfirmationMaxRetry: 40, // timeout after 120 seconds
+      // },
+    });
+
+    let requests = [];
+    for (let i = 0; i < requestIds.length; i++) {
+      const request = await requestClient.fromRequestId(requestIds[i]);
+      const requestData = request.getData();
+      console.log(request);
+
+      const requestObject = {
+        requestData : requestData,
+        requestFunctions : request
+      }
+      requests.push(requestObject);
+    }
+    setRequestsData(requests as any);
+    console.log(requests);
+    
+    
+  }
+
+  async function declarePaymentReceived(request: any, amount:any, addressValue:any) {
+
+    let provider;
+    if (process.env.WEB3_PROVIDER_URL === undefined) {
+      // Connect to Metamask and other injected wallets
+      provider = new providers.Web3Provider(window.ethereum as any);
+    } else {
+      // Connect to your own Ethereum node or 3rd party node provider
+      provider = new providers.JsonRpcProvider(process.env.WEB3_PROVIDER_URL);
+    }
+    const signatureProvider = new Web3SignatureProvider(provider);
+    const requestClient = new RequestNetwork({
+      nodeConnectionConfig: {
+        baseURL: storageChains.get(storageChain)!.gateway,
+      },
+      signatureProvider,
+      // httpConfig: {
+      //   getConfirmationMaxRetry: 40, // timeout after 120 seconds
+      // },
+    });
+    
+    const fetchedRequest = await requestClient.fromRequestId(request.id);
+
+
+    console.log(request)
+    await fetchedRequest.declareReceivedPayment(amount, 'received payment', {
+      type: 'ethereumAddress' as any,
+      value: addressValue
+    });
+  }
+
+  React.useEffect(() => {
+    getRequestIds();
+    console.log(requestsData);
+  }, []);
+
   return (
     <>
       <div className="flex py-8 justify-center gap-5">
@@ -124,40 +222,37 @@ const Page = () => {
                       {/* row 1 */}
                       <tr>
                         <td>
-                          <div className="font-bold pl-1">0x82A29547CA8970c2aDECF4C2db7e364339f9a4B7</div>
+                          <div className="font-bold pl-1">Payer Address</div>
                         </td>
                         <td>
-                          <div className="font-bold pl-1">Closed</div>
-                        </td>
-                        <td>
-                          <div className="font-bold pl-1">
-                            <button className="btn btn-sm">Sign Receipt</button>
-                          </div>
-                        </td>
-                      </tr>
-                      {/* row 2 */}
-                      <tr>
-                        <td>
-                          <div className="font-bold pl-1">blackicon.eth</div>
-                        </td>
-                        <td>
-                          <div className="font-bold pl-1">Closed</div>
+                          <div className="font-bold pl-1">Status</div>
                         </td>
                         <td>
                           <div className="font-bold pl-1">
-                            <button className="btn btn-sm">See Receipt</button>
+                           Action
                           </div>
                         </td>
                       </tr>
-                      {/* row 3 */}
-                      <tr>
-                        <td>
-                          <div className="font-bold pl-1">vitalik.eth</div>
-                        </td>
-                        <td>
-                          <div className="font-bold pl-1">Expiring in 30 days</div>
-                        </td>
-                      </tr>
+                      {requestsData ? (
+                        requestsData.map((request: any, index) => (
+                          <tr key={index}>
+                            <td>
+                              <div className="font-bold pl-1">{request.requestData.payer.value}</div>
+                            </td>
+                            <td>
+                              <div className="font-bold pl-1">{request.requestData.state}</div>
+                            </td>
+                            <td>
+                              <div className="font-bold pl-1">
+                              {request.requestData.state === "created" && <button className="btn btn-sm" onClick={() => declarePaymentReceived(request.requestFunctions, request.requestData.expectedAmount, request.requestData.payee.value)}>Sign Receipt</button>}
+                               
+                              </div>
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <div>loading</div>
+                      )}
                     </tbody>
                   </table>
                 </div>

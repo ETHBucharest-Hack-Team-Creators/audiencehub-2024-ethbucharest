@@ -109,7 +109,7 @@ async function createRequest() {
       },
       //PRICE VARIABLE
       expectedAmount: parseUnits(
-   `0.005`,
+   singleItemPrice,
         18
       ).toString(),
       payee: {
@@ -172,7 +172,7 @@ async function createRequest() {
  
 
     //PRICE VARIABLE
-    sendTransactionAsync({ to: address as string, value: parseUnits("0.0005", 18) });
+    sendTransactionAsync({ to: address as string, value: parseUnits(singleItemPrice, 18) });
      
   
    notification.remove(notificationSendTx);
@@ -185,7 +185,7 @@ async function createRequest() {
    notification.remove(notificationLoadingDeclaring);
 
 
-    await request.declareSentPayment('10', 'sent payment', {
+    await request.declareSentPayment(singleItemPrice, 'sent payment', {
       type: "ethereumAddress" as any,
       value: address as string,
     })
