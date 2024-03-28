@@ -91,7 +91,7 @@ export function useFB() {
     const id = `${address}_${Date.now()}`;
     if (!db) return;
     try {
-      await setDoc(doc(db, "creatorsContent", id), {
+      await setDoc(doc(db, "contents", id), {
         creator: address,
         content,
         urls,
@@ -104,7 +104,7 @@ export function useFB() {
   const getCreatorContents = async (address: string) => {
     if (!db) return;
     console.log("getContents");
-    const contentsRef = collection(db, "creatorsContent");
+    const contentsRef = collection(db, "contents");
 
     const q = query(contentsRef, where("creator", "==", address));
 
@@ -120,7 +120,7 @@ export function useFB() {
 
   const getContent = async (id: string) => {
     if (!db) return;
-    const docRef = doc(db, "creatorsContent", id);
+    const docRef = doc(db, "contents", id);
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
@@ -138,7 +138,7 @@ export function useFB() {
     const id = `${address}_${Date.now()}`;
     if (!db) return;
     try {
-      await setDoc(doc(db, "creatorsContent", id), {
+      await setDoc(doc(db, "items", id), {
         creator: address,
         title,
         description,
@@ -152,7 +152,7 @@ export function useFB() {
   const getItems = async (address: string) => {
     if (!db) return;
     console.log("getItems");
-    const contentsRef = collection(db, "creatorsItem");
+    const contentsRef = collection(db, "items");
 
     const q = query(contentsRef, where("creator", "==", address));
 
