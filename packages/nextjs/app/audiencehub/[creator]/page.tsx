@@ -146,7 +146,60 @@ export default function Page({ params }: { params: { creator: string } }) {
 
         }
 
-        <div></div>
+        <div className="grid grid-cols-1 items-center align-middle">
+          <div className="flex justify-center mt-5 font-bold">Merch & Items </div>
+          <div className="grid grid-cols-4 space-x-auto  mt-5">
+          <div className="card w-72 bg-base-100 shadow-xl mx-5">
+  <figure className="px-10 pt-10">
+    <img src="https://daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.jpg" alt="Shoes" className="rounded-xl" />
+  </figure>
+  <div className="card-body items-center text-center">
+    <h2 className="card-title">Shoes!</h2>
+    <p>If a dog chews shoes whose shoes does he choose?</p>
+    <div className="card-actions">
+      <button className="btn btn-primary">Buy Now</button>
+    </div>
+  </div>
+</div>
+<div className="card w-72 bg-base-100 shadow-xl mx-5">
+  <figure className="px-10 pt-10">
+    <img src="https://daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.jpg" alt="Shoes" className="rounded-xl" />
+  </figure>
+  <div className="card-body items-center text-center">
+    <h2 className="card-title">Shoes!</h2>
+    <p>If a dog chews shoes whose shoes does he choose?</p>
+    <div className="card-actions">
+      <button className="btn btn-primary">Buy Now</button>
+    </div>
+  </div>
+</div>
+<div className="card w-72 bg-base-100 shadow-xl mx-5">
+  <figure className="px-10 pt-10">
+    <img src="https://daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.jpg" alt="Shoes" className="rounded-xl" />
+  </figure>
+  <div className="card-body items-center text-center">
+    <h2 className="card-title">Shoes!</h2>
+    <p>If a dog chews shoes whose shoes does he choose?</p>
+    <div className="card-actions">
+      <button className="btn btn-primary">Buy Now</button>
+    </div>
+  </div>
+</div>
+<div className="card w-72 bg-base-100 shadow-xl mx-5">
+  <figure className="px-10 pt-10">
+    <img src="https://daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.jpg" alt="Shoes" className="rounded-xl" />
+  </figure>
+  <div className="card-body items-center text-center">
+    <h2 className="card-title">Shoes!</h2>
+    <p>If a dog chews shoes whose shoes does he choose?</p>
+    <div className="card-actions">
+      <button className="btn btn-primary">Buy Now</button>
+    </div>
+  </div>
+</div>
+
+          </div>
+        </div>
       </div>
     </>
   );
