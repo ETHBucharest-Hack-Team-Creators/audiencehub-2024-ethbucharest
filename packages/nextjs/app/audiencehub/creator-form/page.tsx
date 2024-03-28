@@ -12,17 +12,31 @@ const Page = () => {
   const [profileBanner, setProfileBanner] = useState<File | null>(null);
   const { address } = useAccount();
 
-  const { postCreator } = useFB();
+  const { postCreator, uploadImages } = useFB();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !profilePicture) {
       alert("Name and profile picture are required!");
       return;
     }
+    let propicURL = [""];
+    let bannerURL = [""];
+    try {
+      propicURL = await uploadImages([profilePicture]);
+    } catch (e) {
+      console.error(e);
+    }
+    if (profileBanner) {
+      try {
+        bannerURL = await uploadImages([profileBanner]);
+      } catch (e) {
+        console.error(e);
+      }
+    }
     if (address) {
       try {
-        postCreator(address, "", name, bio);
+        postCreator(address, propicURL[0], bannerURL[0], name, bio);
         alert("Profile created successfully!");
         window.location.reload();
       } catch (e) {
