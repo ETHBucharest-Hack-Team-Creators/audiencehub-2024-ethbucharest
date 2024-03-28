@@ -41,10 +41,10 @@ const ItemForm = () => {
   };
 
   return (
-    <div className="my-5 px-96">
-      <div className="flex flex-col gap-8 object-left-top min-h-screen bg-gray-100 pt-12 px-14 shadow-md rounded-lg">
+    <div className="my-7 px-96">
+      <div className="flex flex-col gap-8 object-left-top bg-gray-100 pt-9 px-14 shadow-md rounded-lg">
         <div className="flex flex-row gap-3">
-          <span className="mb-6 block text-lg font-medium leading-tight text-black sm:text-[30px] xl:text-[40px]">
+          <span className="mb-5 block text-lg font-medium leading-tight text-black sm:text-[30px] xl:text-[40px]">
             What do you want to sell?
           </span>
           <CubeIcon className="w-10 h-10 text-gray-500" />
@@ -94,7 +94,7 @@ const ItemForm = () => {
             onChange={e => setItemPicture(e.target.files ? e.target.files[0] : null)}
           />
         </div>
-        <div className="pt-16">
+        <div className="pt-8 pb-9">
           <button onClick={handleSubmit} className="btn btn-primary w-full max-w-xs rounded-3xl">
             Submit
           </button>
