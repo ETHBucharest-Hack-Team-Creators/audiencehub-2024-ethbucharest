@@ -23,7 +23,7 @@ export default function Page({ params }: { params: { creator: string } }) {
 const sablier_Address = "0x7a43F8a888fa15e68C103E18b0439Eb1e98E4301"
 
 
-
+//check for allownce of dai
   const { data: connectedAddressCounter } = useScaffoldContractRead({
     contractName: "DAI",
     functionName: "allowance",
@@ -31,8 +31,16 @@ const sablier_Address = "0x7a43F8a888fa15e68C103E18b0439Eb1e98E4301"
     watch: true
   });
 
+  //check for nft ownership
+  const { data: isOwner } = useScaffoldContractRead({
+    contractName: "DAI",
+    functionName: "allowance",
+    args: [address, sablier_Address],
+    watch: true
+  });
 
 
+//create stream
   const { writeAsync, isLoading, isMining } = useScaffoldContractWrite({
 
     contractName: "Sablier",
@@ -65,7 +73,7 @@ const sablier_Address = "0x7a43F8a888fa15e68C103E18b0439Eb1e98E4301"
         </div>
         <div className="flex justify-center mt-5 font-bold">{params.creator} </div>
         
-        <p>{connectedAddressCounter > price ? 
+        <p>{connectedAddressCounter && connectedAddressCounter > price  ? 
         <button className="btn btn-wide flex justify-center mt-2 btn-primary text-white text-xl" onClick={() => writeAsync()}>Subscribe </button>
         :   <ApproveToken /> }</p>
      
