@@ -12,7 +12,7 @@ import {
   updateDoc,
   where,
 } from "firebase/firestore";
-import { type FirebaseStorage, getDownloadURL, getStorage, ref, uploadBytes  } from "firebase/storage";
+import { type FirebaseStorage, getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -60,13 +60,15 @@ export function useFB() {
     }
   };
 
-  const postCreator = async (address: string, imgUrl: string, name: string, description: string) => {
+  const postCreator = async (address: string, imgUrl: string, bannerURL: string, name: string, description: string) => {
     if (!db) return;
+    console.log("post creator", address);
     try {
       await setDoc(doc(db, "creators", address), {
         creator: address,
         name,
         imgUrl,
+        bannerURL,
         description,
       });
     } catch (error) {
@@ -167,7 +169,7 @@ export function useFB() {
   // IMAGE
   const uploadImages = async (files: File[]) => {
     const uploadPromises = files.map((file: File) => {
-      if (!storage) return;
+      if (!storage) return Promise.resolve("");
       const fileRef = ref(storage, `uploads/${file.name}`);
       return uploadBytes(fileRef, file).then(snapshot => getDownloadURL(snapshot.ref));
     });
