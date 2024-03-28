@@ -1,4 +1,5 @@
 "use client";
+
 import Image from "next/image";
 import type { NextPage } from "next";
 import { BanknotesIcon, MagnifyingGlassIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
@@ -24,9 +25,9 @@ const Home: NextPage = () => {
                 </span>
                 <h1 className="mb-6 text-3xl font-bold leading-tight text-black  sm:text-[40px] md:text-[50px] lg:text-[42px] xl:text-[50px]">
                   Using
-                  <span className="inline text-[#32c89b] bg-clip-text text-transparent mx-2">Request Network</span>
+                  <span className="inline text-[#32c89b] bg-clip-text mx-2">Request Network</span>
                   and
-                  <span className="inline text-[#fe7f01] bg-clip-text text-transparent mx-2">Sablier</span>
+                  <span className="inline text-[#fe7f01] bg-clip-text mx-2">Sablier</span>
                 </h1>
                 <p className="mb-10 max-w-[475px] text-base leading-relaxed text-body">
                   Support your favourite content creator with crypto.
