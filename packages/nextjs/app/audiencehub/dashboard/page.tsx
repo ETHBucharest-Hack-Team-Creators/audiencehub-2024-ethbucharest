@@ -29,7 +29,7 @@ const Page = () => {
         {(() => {
           if (userType === "fan") {
             return (
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto shadow-md">
                 <table className="table table-zebra-zebra">
                   <tbody>
                     {/* row 1 */}
@@ -118,7 +118,7 @@ const Page = () => {
                 <div>
                   <h1 className="text-3xl pb-4">Your Loyal Fans</h1>
                 </div>
-                <div className="overflow-x-auto">
+                <div className="overflow-x-auto shadow-md">
                   <table className="table table-zebra-zebra">
                     <tbody>
                       {/* row 1 */}
