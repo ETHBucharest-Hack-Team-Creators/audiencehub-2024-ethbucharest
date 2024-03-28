@@ -32,7 +32,7 @@ export default function Page({ params }: { params: { creator: string } }) {
   const [streamOwner, setStreamOwner] = useState("") as any;
   const [isStreamOwner, setIsStreamOnwer] = useState(false) as any;
   const [requestDataProps, setRequestDataProps] = useState({} as any);
-  const price = 10000000000000000;
+
   const router = useRouter() as any;
   function delay(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -77,8 +77,9 @@ export default function Page({ params }: { params: { creator: string } }) {
 
   const {address} = useAccount()
 
-
-
+  const singleItemPrice = "0.005";
+   const subscriptionPrice = parseUnits(singleItemPrice, 18);
+  
 
 
   const payeeIdentity = address as string;
@@ -108,7 +109,7 @@ async function createRequest() {
       },
       //PRICE VARIABLE
       expectedAmount: parseUnits(
-   `10`,
+   `0.005`,
         18
       ).toString(),
       payee: {
@@ -242,7 +243,7 @@ useEffect(() => {
       [
         address,
         "0x64336a17003cDCcde3cebEcff1CDEc2f9AeEdB7d",
-        price,
+        subscriptionPrice,
         "0x776b6fC2eD15D6Bb5Fc32e0c89DE68683118c62A",
         true,
         true,
@@ -309,7 +310,8 @@ useEffect(() => {
 
         {streamOwner !== false && (
           <div>
-            {connectedAddressCounter && connectedAddressCounter > price ? (
+            {connectedAddressCounter && connectedAddressCounter > subscriptionPrice ? (
+              //Subscribe button Sablier
               <button
                 className="btn btn-wide flex justify-center mt-2 btn-primary text-white text-xl"
                 onClick={() => writeAsync()}
