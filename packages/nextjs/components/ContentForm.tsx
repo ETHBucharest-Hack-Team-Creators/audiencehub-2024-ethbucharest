@@ -2,34 +2,33 @@
 
 import React, { useState } from "react";
 import { useAccount } from "wagmi";
-import { CubeIcon } from "@heroicons/react/24/outline";
+import { ForwardIcon } from "@heroicons/react/24/outline";
 import { useFB } from "~~/hooks/useFB";
 
-const Page = () => {
+const ContentForm = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [itemPicture, setItemPicture] = useState<File | null>(null);
+  const [picture, setPicture] = useState<File | null>(null);
   const { address } = useAccount();
 
-  const { postOneItem, uploadImages } = useFB();
+  const { postContent, uploadImages } = useFB();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title || !itemPicture) {
-      alert("Title and item picture are required!");
+    if (!title || !picture) {
+      alert("Title and content picture are required!");
       return;
     }
-    let itemURL = [""];
+    let contentURL = [""];
     try {
-      itemURL = await uploadImages([itemPicture]);
+      contentURL = await uploadImages([picture]);
     } catch (e) {
       console.error(e);
     }
     if (address) {
       try {
-        postOneItem(address, title, description, itemURL[0]);
-        alert("Item created successfully!");
-        window.location.reload();
+        postContent(address, title, description, contentURL[0]);
+        alert("Content created successfully!");
       } catch (e) {
         console.error(e);
       }
@@ -41,9 +40,9 @@ const Page = () => {
       <div className="flex flex-col gap-8 object-left-top min-h-screen bg-gray-100 pt-12 px-14 shadow-md rounded-lg">
         <div className="flex flex-row gap-3">
           <span className="mb-6 block text-lg font-medium leading-tight text-black sm:text-[30px] xl:text-[40px]">
-            What do you want to sell?
+            What content are you creating?
           </span>
-          <CubeIcon className="w-10 h-10 text-gray-500" />
+          <ForwardIcon className="w-10 h-10 text-red-500" />
         </div>
         <div>
           <span className="mb-1 block text-lg font-medium leading-tight text-black sm:text-[22px] xl:text-[22px]">
@@ -63,7 +62,7 @@ const Page = () => {
           </span>
           <textarea
             className="textarea rounded-3xl"
-            placeholder="Insert a description of your item"
+            placeholder="Insert a description of your content"
             value={description}
             onChange={e => setDescription(e.target.value)}
           />
@@ -75,10 +74,10 @@ const Page = () => {
           <input
             type="file"
             className="file-input file-input-primary w-full max-w-xs rounded-3xl"
-            onChange={e => setItemPicture(e.target.files ? e.target.files[0] : null)}
+            onChange={e => setPicture(e.target.files ? e.target.files[0] : null)}
           />
         </div>
-        <div className="pt-32">
+        <div className="pt-20">
           <button onClick={handleSubmit} className="btn btn-primary w-full max-w-xs rounded-3xl">
             Submit
           </button>
@@ -88,4 +87,4 @@ const Page = () => {
   );
 };
 
-export default Page;
+export default ContentForm;

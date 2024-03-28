@@ -60,7 +60,14 @@ export function useFB() {
     }
   };
 
-  const postCreator = async (address: string, imgUrl: string, bannerURL: string, name: string, description: string) => {
+  const postCreator = async (
+    address: string,
+    imgUrl: string,
+    bannerURL: string,
+    name: string,
+    description: string,
+    price: number,
+  ) => {
     if (!db) return;
     console.log("post creator", address);
     try {
@@ -70,6 +77,7 @@ export function useFB() {
         imgUrl,
         bannerURL,
         description,
+        price,
       });
     } catch (error) {
       console.log(error);
@@ -86,15 +94,16 @@ export function useFB() {
   };
 
   // CONTENT
-  const postContent = async (address: string, content: string, urls: (string | undefined)[]) => {
+  const postContent = async (address: string, title: string, description: string, imgUrl: string) => {
     console.log("post content", address);
     const id = `${address}_${Date.now()}`;
     if (!db) return;
     try {
       await setDoc(doc(db, "contents", id), {
         creator: address,
-        content,
-        urls,
+        title,
+        description,
+        imgUrl,
       });
     } catch (error) {
       console.log(error);
@@ -133,7 +142,7 @@ export function useFB() {
   };
 
   // ITEM
-  const postOneItem = async (address: string, title: string, description: string, imgUrl: string) => {
+  const postOneItem = async (address: string, title: string, description: string, price: number, imgUrl: string) => {
     console.log("postOneItem", address);
     const id = `${address}_${Date.now()}`;
     if (!db) return;
@@ -142,6 +151,7 @@ export function useFB() {
         creator: address,
         title,
         description,
+        price,
         imgUrl,
       });
     } catch (error) {

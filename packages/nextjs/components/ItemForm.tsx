@@ -2,43 +2,38 @@
 
 import React, { useState } from "react";
 import { useAccount } from "wagmi";
-import { SparklesIcon } from "@heroicons/react/24/outline";
+import { CubeIcon } from "@heroicons/react/24/outline";
 import { useFB } from "~~/hooks/useFB";
 
-const Page = () => {
-  const [name, setName] = useState("");
-  const [bio, setBio] = useState("");
-  const [profilePicture, setProfilePicture] = useState<File | null>(null);
-  const [profileBanner, setProfileBanner] = useState<File | null>(null);
+const ItemForm = () => {
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [price, setPrice] = useState(0);
+  const [itemPicture, setItemPicture] = useState<File | null>(null);
   const { address } = useAccount();
 
-  const { postCreator, uploadImages } = useFB();
+  const { postOneItem, uploadImages } = useFB();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !profilePicture) {
-      alert("Name and profile picture are required!");
+    if (price <= 0 || !price) {
+      alert("Price must be greater than 0!");
       return;
     }
-    let propicURL = [""];
-    let bannerURL = [""];
+    if (!title || !itemPicture) {
+      alert("Title, price and item picture are required!");
+      return;
+    }
+    let itemURL = [""];
     try {
-      propicURL = await uploadImages([profilePicture]);
+      itemURL = await uploadImages([itemPicture]);
     } catch (e) {
       console.error(e);
     }
-    if (profileBanner) {
-      try {
-        bannerURL = await uploadImages([profileBanner]);
-      } catch (e) {
-        console.error(e);
-      }
-    }
     if (address) {
       try {
-        postCreator(address, propicURL[0], bannerURL[0], name, bio);
-        alert("Profile created successfully!");
-        window.location.reload();
+        postOneItem(address, title, description, price, itemURL[0]);
+        alert("Item created successfully!");
       } catch (e) {
         console.error(e);
       }
@@ -50,51 +45,53 @@ const Page = () => {
       <div className="flex flex-col gap-8 object-left-top min-h-screen bg-gray-100 pt-12 px-14 shadow-md rounded-lg">
         <div className="flex flex-row gap-3">
           <span className="mb-6 block text-lg font-medium leading-tight text-black sm:text-[30px] xl:text-[40px]">
-            Create your profile
+            What do you want to sell?
           </span>
-          <SparklesIcon className="w-10 h-10 text-yellow-500" />
+          <CubeIcon className="w-10 h-10 text-gray-500" />
         </div>
         <div>
           <span className="mb-1 block text-lg font-medium leading-tight text-black sm:text-[22px] xl:text-[22px]">
-            Name
+            Title
           </span>
           <input
             type="text"
-            placeholder="Insert your name here"
+            placeholder="Insert a title"
             className="input w-full max-w-xs rounded-3xl"
-            value={name}
-            onChange={e => setName(e.target.value)}
+            value={title}
+            onChange={e => setTitle(e.target.value)}
           />
         </div>
         <div>
           <span className="mb-1 block text-lg font-medium leading-tight text-black sm:text-[22px] xl:text-[22px]">
-            Bio
+            Description
           </span>
           <textarea
             className="textarea rounded-3xl"
-            placeholder="Insert a description of yourself"
-            value={bio}
-            onChange={e => setBio(e.target.value)}
+            placeholder="Insert a description of your item"
+            value={description}
+            onChange={e => setDescription(e.target.value)}
           />
         </div>
         <div>
           <span className="mb-1 block text-lg font-medium leading-tight text-black sm:text-[22px] xl:text-[22px]">
-            Select your profile picture
+            Price
           </span>
           <input
-            type="file"
-            className="file-input file-input-primary w-full max-w-xs rounded-3xl"
-            onChange={e => setProfilePicture(e.target.files ? e.target.files[0] : null)}
+            type="number"
+            placeholder="Insert a price"
+            className="input w-full max-w-xs rounded-3xl"
+            value={price}
+            onChange={e => setPrice(parseFloat(e.target.value))}
           />
         </div>
         <div>
           <span className="mb-1 block text-lg font-medium leading-tight text-black sm:text-[22px] xl:text-[22px]">
-            Select your banner
+            Select a picture for it
           </span>
           <input
             type="file"
             className="file-input file-input-primary w-full max-w-xs rounded-3xl"
-            onChange={e => setProfileBanner(e.target.files ? e.target.files[0] : null)}
+            onChange={e => setItemPicture(e.target.files ? e.target.files[0] : null)}
           />
         </div>
         <div className="pt-16">
@@ -107,4 +104,4 @@ const Page = () => {
   );
 };
 
-export default Page;
+export default ItemForm;
