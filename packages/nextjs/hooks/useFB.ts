@@ -84,14 +84,14 @@ export function useFB() {
   };
 
   // CONTENT
-  const postContent = async (address: string, content: string, urls: (string | undefined)[]) => {
-    console.log("post content", address);
+  const postContent = async (address: string, title: string, description: string, urls: (string | undefined)[]) => {
     const id = `${address}_${Date.now()}`;
     if (!db) return;
     try {
       await setDoc(doc(db, "creatorsContent", id), {
         creator: address,
-        content,
+        title,
+        description,
         urls,
       });
     } catch (error) {
