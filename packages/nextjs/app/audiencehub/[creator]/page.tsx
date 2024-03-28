@@ -2,11 +2,25 @@
 
 import { useEffect } from "react";
 import { BlockieAvatar } from "~~/components/scaffold-eth";
+import { useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
+
 
 export default function Page({ params }: { params: { creator: string } }) {
   useEffect(() => {
     console.log(params);
   }, []);
+
+
+  const { writeAsync, isLoading, isMining } = useScaffoldContractWrite({
+    contractName: "YourContract",
+    functionName: "setGreeting",
+    args: ["The value to set"],
+    blockConfirmations: 1,
+    onBlockConfirmation: txnReceipt => {
+      console.log("Transaction blockHash", txnReceipt.blockHash);
+    },
+  });
+
 
   return (
     <>
