@@ -1,14 +1,16 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { getTransactionReceipt } from "viem/_types/actions/public/getTransactionReceipt";
+import { waitForTransactionReceipt } from "viem/_types/actions/public/waitForTransactionReceipt";
 import { useAccount } from "wagmi";
 import ApproveToken from "~~/components/ApproveToken";
 import { BlockieAvatar } from "~~/components/scaffold-eth";
-import { useScaffoldContractRead, useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
+import { useScaffoldContractRead, useScaffoldContractWrite, useScaffoldEventSubscriber } from "~~/hooks/scaffold-eth";
 
 
 export default function Page({ params }: { params: { creator: string } }) {
-
+    const [streamId, setStreamId] = useState("") as any;
 
   const price = 10000000000000000;
 
@@ -21,6 +23,7 @@ export default function Page({ params }: { params: { creator: string } }) {
 
   
 const sablier_Address = "0x7a43F8a888fa15e68C103E18b0439Eb1e98E4301"
+
 
 
 //check for allownce of dai
@@ -41,7 +44,7 @@ const sablier_Address = "0x7a43F8a888fa15e68C103E18b0439Eb1e98E4301"
 
 
 //create stream
-  const { writeAsync, isLoading, isMining } = useScaffoldContractWrite({
+  const { writeAsync, isLoading, isMining} = useScaffoldContractWrite({
 
     contractName: "Sablier",
     functionName: "createWithDurations",
@@ -50,10 +53,41 @@ const sablier_Address = "0x7a43F8a888fa15e68C103E18b0439Eb1e98E4301"
     blockConfirmations: 1,
     onBlockConfirmation: txnReceipt => {
       console.log("Transaction blockHash", txnReceipt.blockHash);
+
     },
+    onSettled(data, error) {
+      console.log('Settled', { data, error })
+    },
+   
   });
 
 
+
+// check for event 
+useScaffoldEventSubscriber({
+  contractName: "Sablier",
+  eventName: "CreateLockupLinearStream",
+  // The listener function is called whenever a GreetingChange event is emitted by the contract.
+  // Parameters emitted by the event can be destructed using the below example
+  // for this example: event GreetingChange(address greetingSetter, string newGreeting, bool premium, uint256 value);
+  listener: logs => {
+    logs.map(log => {
+
+      const args = log.args;
+      const sender = log.args[0];
+      if(sender === address) {
+        setStreamId(log.args[3])
+
+        //post stream id here in database
+
+        console.log("Sender", true)
+      } 
+      const streamId = log.args[3];
+      console.log("Event emitted ", args);
+      console.log("StreamId : ", streamId)
+    });
+  },
+});
 
 
 
