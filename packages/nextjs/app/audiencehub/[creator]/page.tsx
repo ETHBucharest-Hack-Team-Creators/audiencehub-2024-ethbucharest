@@ -10,6 +10,7 @@ import { BlockieAvatar } from "~~/components/scaffold-eth";
 import { useScaffoldContractRead, useScaffoldContractWrite, useScaffoldEventSubscriber } from "~~/hooks/scaffold-eth";
 import  { useRouter } from "next/navigation";
 import { notification } from "~~/utils/scaffold-eth";
+import { BuyNow } from "~~/components/BuyNow";
 
 export default function Page({ params }: { params: { creator: string } }) {
   const [streamId, setStreamId] = useState("") as any;
@@ -193,7 +194,7 @@ export default function Page({ params }: { params: { creator: string } }) {
     <h2 className="card-title">Shoes!</h2>
     <p>If a dog chews shoes whose shoes does he choose?</p>
     <div className="card-actions">
-      <button className="btn btn-primary">Buy Now</button>
+      <BuyNow address={`${address}`} />
     </div>
   </div>
 </div>
