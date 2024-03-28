@@ -1,9 +1,10 @@
 import * as React from 'react'
 import { 
+  useAccount,
   useSendTransaction, 
    
 } from 'wagmi' 
-import { parseEther } from 'viem' 
+import { parseEther, parseUnits } from 'viem' 
 import { useWalletClient } from "wagmi";
 import { Web3SignatureProvider } from "@requestnetwork/web3-signature";
 import { RequestNetwork } from "@requestnetwork/request-client.js"
@@ -11,8 +12,8 @@ import { Types, Utils } from "@requestnetwork/request-client.js";
 
 
 
- 
-export function BuyNow({address} : any) {
+ //creator's address
+export function BuyNow({address, itemPrice} : any) {
   const { 
     data: hash, 
     isLoading, 
@@ -20,6 +21,7 @@ export function BuyNow({address} : any) {
   } = useSendTransaction() 
 
   const { data: walletClient } = useWalletClient();
+  
   const web3SignatureProvider = new Web3SignatureProvider(walletClient);
 
 
@@ -31,7 +33,7 @@ export function BuyNow({address} : any) {
   });
 
   const payeeIdentity = address;
-const payerIdentity = ;
+const payerIdentity = address;
 const paymentRecipient = payeeIdentity;
 const feeRecipient = '0x0000000000000000000000000000000000000000';
 
@@ -41,13 +43,13 @@ const requestCreateParameters = {
     // The currency in which the request is denominated
     currency: {
       type: Types.RequestLogic.CURRENCY.ERC20,
-      value: '0x370DE27fdb7D1Ff1e1BaA7D11c5820a324Cf623C',
+      value: '0x776b6fC2eD15D6Bb5Fc32e0c89DE68683118c62A',
       network: 'sepolia',
     },
     
     // The expected amount as a string, in parsed units, respecting `decimals`
     // Consider using `parseUnits()` from ethers or viem
-    expectedAmount: '1000000000000000000',
+    expectedAmount: parseUnits(itemPrice, 18),
     
     // The payee identity. Not necessarily the same as the payment recipient.
     payee: {
@@ -94,7 +96,8 @@ const requestCreateParameters = {
     e.preventDefault() 
     
     const to = address 
-    const value = '0.001' // should be as 0.005, 0.01 etc.
+    //replace with creator price
+    const value = itemPrice // should be as 0.005, 0.01 etc.
     sendTransaction({ to, value: parseEther(value) }) 
   } 
 

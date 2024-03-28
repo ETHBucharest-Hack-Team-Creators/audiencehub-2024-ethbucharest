@@ -194,7 +194,7 @@ export default function Page({ params }: { params: { creator: string } }) {
     <h2 className="card-title">Shoes!</h2>
     <p>If a dog chews shoes whose shoes does he choose?</p>
     <div className="card-actions">
-      <BuyNow address={`${address}`} />
+      <BuyNow address={`${params.creator}`} itemPrice={"0.001"}/>
     </div>
   </div>
 </div>
