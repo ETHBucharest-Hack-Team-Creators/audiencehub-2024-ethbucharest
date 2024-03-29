@@ -204,6 +204,22 @@ export function useFB() {
     return downloadUrls;
   };
 
+  // REQUESTS
+  const getStreamingRequests = async (address: string) => {
+    if (!db) return;
+    console.log("getRequests");
+    const requestsRef = collection(db, "creator_requestids", address, "requestids");
+
+    const q = query(requestsRef, where("isOneTimePayment", "==", false));
+
+    const querySnapshot = await getDocs(q);
+    const requests: any = [];
+    querySnapshot.forEach(doc => {
+      requests.push(doc.data());
+    });
+    return requests;
+  };
+
   return {
     db,
     storage,
@@ -221,5 +237,7 @@ export function useFB() {
     getItems,
 
     uploadImages,
+
+    getStreamingRequests,
   };
 }

@@ -29,7 +29,7 @@ const Page = () => {
   }, []);
 
   return (
-    <div className="flex flex-col px-12 pt-5">
+    <div className="flex flex-col px-12 pt-4">
       <div className="flex flex-row gap-3 py-8 justify-center">
         <StarIcon className="w-10 h-10 text-yellow-500 -m-1" />
         <h1 className="text-3xl text-center">Find new Creators</h1>

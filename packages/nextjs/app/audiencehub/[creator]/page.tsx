@@ -1,32 +1,30 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { RequestNetwork, Types, Utils } from "@requestnetwork/request-client.js";
+import { Web3SignatureProvider } from "@requestnetwork/web3-signature";
+import { providers } from "ethers";
+import { parseEther, parseUnits, zeroAddress } from "viem";
 import { getTransactionReceipt } from "viem/_types/actions/public/getTransactionReceipt";
 import { waitForTransactionReceipt } from "viem/_types/actions/public/waitForTransactionReceipt";
 import { useAccount, useWaitForTransaction } from "wagmi";
+import { useWalletClient } from "wagmi";
+import { useSendTransaction } from "wagmi";
 import ApproveToken from "~~/components/ApproveToken";
-import { BlockieAvatar } from "~~/components/scaffold-eth";
-import { useScaffoldContractRead, useScaffoldContractWrite, useScaffoldEventSubscriber } from "~~/hooks/scaffold-eth";
-import  { useRouter } from "next/navigation";
-import { notification } from "~~/utils/scaffold-eth";
 import { BuyNow } from "~~/components/BuyNow";
-import { RequestNetwork, Types, Utils } from "@requestnetwork/request-client.js";
+import ShopItem from "~~/components/ShopItem";
+import { BlockieAvatar } from "~~/components/scaffold-eth";
 import { currencies } from "~~/config/currency";
 import { storageChains } from "~~/config/storage-chains";
-import { useWalletClient } from "wagmi";
-import { providers } from "ethers";
-import { useSendTransaction } from "wagmi";
-import { parseEther, parseUnits, zeroAddress } from 'viem';
-import { Web3SignatureProvider } from "@requestnetwork/web3-signature";
-import ShopItem from "~~/components/ShopItem";
+import { useScaffoldContractRead, useScaffoldContractWrite, useScaffoldEventSubscriber } from "~~/hooks/scaffold-eth";
+import { notification } from "~~/utils/scaffold-eth";
 
 export default function Page({ params }: { params: { creator: string } }) {
-
-//HANDLE BUTTON PAY SUBSCRIPTION
-//HANDLE BUTTON PAY ONE TIME ITEM
-//POST REQUEST ID TO DATABASE IF SUCCESS WITH THE CORESPONDENT DATA 
-
+  //HANDLE BUTTON PAY SUBSCRIPTION
+  //HANDLE BUTTON PAY ONE TIME ITEM
+  //POST REQUEST ID TO DATABASE IF SUCCESS WITH THE CORESPONDENT DATA
 
   const [streamId, setStreamId] = useState("") as any;
   const [streamOwner, setStreamOwner] = useState("") as any;
@@ -47,167 +45,141 @@ export default function Page({ params }: { params: { creator: string } }) {
     ERROR_OCCURRED = "error occurred",
   }
 
-  const { 
-    data: hash, 
-    isLoading, 
+  const {
+    data: hash,
+    isLoading,
     isSuccess,
     isError,
-    
+
     sendTransaction,
-    sendTransactionAsync, 
-
-   
+    sendTransactionAsync,
   } = useSendTransaction();
-
 
   const { data: walletClient } = useWalletClient();
   const [currency, setCurrency] = useState(currencies.keys().next().value);
   const [expectedAmount, setExpectedAmount] = useState("");
 
   const [status, setStatus] = useState(APP_STATUS.AWAITING_INPUT);
-  const [storageChain, setStorageChain] = useState(
-    storageChains.keys().next().value,
-  );
+  const [storageChain, setStorageChain] = useState(storageChains.keys().next().value);
 
-  const [requestData, setRequestData] =
-    useState<Types.IRequestDataWithEvents>();
-//IT'S ABOUT PROVIDER
-//AMOUNT IS 10 DAI , TO MODIFY WITH PARAMETERS
+  const [requestData, setRequestData] = useState<Types.IRequestDataWithEvents>();
+  //IT'S ABOUT PROVIDER
+  //AMOUNT IS 10 DAI , TO MODIFY WITH PARAMETERS
 
-
-  const {address} = useAccount()
+  const { address } = useAccount();
 
   const singleItemPrice = "0.005";
-   const subscriptionPrice = parseUnits(singleItemPrice, 18);
-  
-
+  const subscriptionPrice = parseUnits(singleItemPrice, 18);
 
   const payeeIdentity = address as string;
-const payerIdentity = address;
-const paymentRecipient = payeeIdentity;
-const feeRecipient = '0x0000000000000000000000000000000000000000';
+  const payerIdentity = address;
+  const paymentRecipient = payeeIdentity;
+  const feeRecipient = "0x0000000000000000000000000000000000000000";
 
-
-
-async function createRequest(reason: string, isOneTimePayment: boolean) {
-  const signatureProvider = new Web3SignatureProvider(walletClient);
-  const requestClient = new RequestNetwork({
-    nodeConnectionConfig: {
-      baseURL: storageChains.get(storageChain)!.gateway,
-    },
-    signatureProvider,
-    // httpConfig: {
-    //   getConfirmationMaxRetry: 40, // timeout after 120 seconds
-    // },
-  });
-  const requestCreateParameters: Types.ICreateRequestParameters = {
-    requestInfo: {
-      currency: {
-        type: Types.RequestLogic.CURRENCY.ERC20,
-        value: "0x776b6fC2eD15D6Bb5Fc32e0c89DE68683118c62A",
-        network: "sepolia",
+  async function createRequest(reason: string, isOneTimePayment: boolean) {
+    const signatureProvider = new Web3SignatureProvider(walletClient);
+    const requestClient = new RequestNetwork({
+      nodeConnectionConfig: {
+        baseURL: storageChains.get(storageChain)!.gateway,
       },
-      //PRICE VARIABLE
-      expectedAmount: parseEther(
-   singleItemPrice,
-      
-      ).toString(),
-      payee: {
+      signatureProvider,
+      // httpConfig: {
+      //   getConfirmationMaxRetry: 40, // timeout after 120 seconds
+      // },
+    });
+    const requestCreateParameters: Types.ICreateRequestParameters = {
+      requestInfo: {
+        currency: {
+          type: Types.RequestLogic.CURRENCY.ERC20,
+          value: "0x776b6fC2eD15D6Bb5Fc32e0c89DE68683118c62A",
+          network: "sepolia",
+        },
+        //PRICE VARIABLE
+        expectedAmount: parseEther(singleItemPrice).toString(),
+        payee: {
+          type: Types.Identity.TYPE.ETHEREUM_ADDRESS,
+          value: address as string,
+        },
+        timestamp: Utils.getCurrentTimestampInSecond(),
+      },
+      paymentNetwork: {
+        id: Types.Extension.PAYMENT_NETWORK_ID.ERC20_FEE_PROXY_CONTRACT,
+        parameters: {
+          paymentNetworkName: "sepolia",
+          paymentAddress: paymentRecipient || address,
+          feeAddress: zeroAddress,
+          feeAmount: "0",
+        },
+      },
+      contentData: {
+        // Consider using rnf_invoice format from @requestnetwork/data-format package.
+        reason: reason,
+        dueDate: "12.12.2039",
+        builderId: "audiencehub",
+      },
+      signer: {
         type: Types.Identity.TYPE.ETHEREUM_ADDRESS,
         value: address as string,
       },
-      timestamp: Utils.getCurrentTimestampInSecond(),
-    },
-    paymentNetwork: {
-      id: Types.Extension.PAYMENT_NETWORK_ID.ERC20_FEE_PROXY_CONTRACT,
-      parameters: {
-        paymentNetworkName: "sepolia",
-        paymentAddress: paymentRecipient || address,
-        feeAddress: zeroAddress,
-        feeAmount: "0",
-      },
-    },
-    contentData: {
-      // Consider using rnf_invoice format from @requestnetwork/data-format package.
-      reason: reason,
-      dueDate: "12.12.2039",
-      builderId: "audiencehub",
-
-    },
-    signer: {
-      type: Types.Identity.TYPE.ETHEREUM_ADDRESS,
-      value: address as string,
-    },
-  };
-
-  if (payerIdentity && payerIdentity.length > 0) {
-    requestCreateParameters.requestInfo.payer = {
-      type: Types.Identity.TYPE.ETHEREUM_ADDRESS,
-      value: payerIdentity,
     };
-  }
 
-  try {
-    let notificationId = null;
-    setStatus(APP_STATUS.PERSISTING_TO_IPFS);
-  notificationId = notification.loading("Persisting to IPFS")
-    const request = await requestClient.createRequest(
-      requestCreateParameters,
-    );
-
-  
-    notification.remove(notificationId);
-   const nofiticationIdPersisting = notification.loading("  Persisting on chain")
-    setStatus(APP_STATUS.PERSISTING_ON_CHAIN);
-    setRequestData(request.getData());
-    const confirmedRequestData = await request.waitForConfirmation();
-    notification.remove(nofiticationIdPersisting);
-    notification.success(" Request confirmed")
-    setStatus(APP_STATUS.REQUEST_CONFIRMED);
-    setRequestDataProps(request);
-    setRequestData(confirmedRequestData);
-    
-    let notificationSendTx;
-    notificationSendTx = notification.loading("Sending Transaction");
- 
-
-    //PRICE VARIABLE
-    if(isOneTimePayment) {
-    sendTransactionAsync({ to: address as string, value: parseUnits(singleItemPrice, 18) });
+    if (payerIdentity && payerIdentity.length > 0) {
+      requestCreateParameters.requestInfo.payer = {
+        type: Types.Identity.TYPE.ETHEREUM_ADDRESS,
+        value: payerIdentity,
+      };
     }
-  
-   notification.remove(notificationSendTx);
-    
-   await delay(2000);
-   if(!isLoading && !isError) {
 
-   let notificationLoadingDeclaring;
-   notificationLoadingDeclaring = notification.loading("Declaring sent payment");
-   notification.remove(notificationLoadingDeclaring);
+    try {
+      let notificationId = null;
+      setStatus(APP_STATUS.PERSISTING_TO_IPFS);
+      notificationId = notification.loading("Persisting to IPFS");
+      const request = await requestClient.createRequest(requestCreateParameters);
 
+      notification.remove(notificationId);
+      const nofiticationIdPersisting = notification.loading("  Persisting on chain");
+      setStatus(APP_STATUS.PERSISTING_ON_CHAIN);
+      setRequestData(request.getData());
+      const confirmedRequestData = await request.waitForConfirmation();
+      notification.remove(nofiticationIdPersisting);
+      notification.success(" Request confirmed");
+      setStatus(APP_STATUS.REQUEST_CONFIRMED);
+      setRequestDataProps(request);
+      setRequestData(confirmedRequestData);
 
-    await request.declareSentPayment(parseEther(singleItemPrice).toString(), 'sent payment', {
-      type: "ethereumAddress" as any,
-      value: address as string,
-    })
-    notification.success("Payment declared successfully")
+      let notificationSendTx;
+      notificationSendTx = notification.loading("Sending Transaction");
+
+      //PRICE VARIABLE
+      if (isOneTimePayment) {
+        sendTransactionAsync({ to: address as string, value: parseUnits(singleItemPrice, 18) });
+      }
+
+      notification.remove(notificationSendTx);
+
+      await delay(2000);
+      if (!isLoading && !isError) {
+        let notificationLoadingDeclaring;
+        notificationLoadingDeclaring = notification.loading("Declaring sent payment");
+        notification.remove(notificationLoadingDeclaring);
+
+        await request.declareSentPayment(parseEther(singleItemPrice).toString(), "sent payment", {
+          type: "ethereumAddress" as any,
+          value: address as string,
+        });
+        notification.success("Payment declared successfully");
+      }
+    } catch (err) {
+      alert("Error occurred");
+      setStatus(APP_STATUS.ERROR_OCCURRED);
+      alert(err);
+    }
   }
 
-  } catch (err) {
-    alert("Error occurred")
-    setStatus(APP_STATUS.ERROR_OCCURRED);
-    alert(err);
-  }
-}
-
-useEffect(() => {
-  isSuccess && notification.success(`Transaction buying success`);
-  isError && notification.error(`Transaction buying failed`);
-}, [isSuccess])
-
-
-
-
+  useEffect(() => {
+    isSuccess && notification.success(`Transaction buying success`);
+    isError && notification.error(`Transaction buying failed`);
+  }, [isSuccess]);
 
   useEffect(() => {
     console.log(params);
@@ -232,9 +204,6 @@ useEffect(() => {
     watch: true,
   });
 
-
-
- 
   //create stream
   const { writeAsync, isMining } = useScaffoldContractWrite({
     contractName: "Sablier",
@@ -254,19 +223,15 @@ useEffect(() => {
     ],
     blockConfirmations: 1,
     onBlockConfirmation: txnReceipt => {
-
       console.log("Transaction blockHash", txnReceipt.blockHash);
-
     },
     onSettled(data, error) {
-
       console.log("Settled", { data, error });
     },
     onSuccess: data => {
-   
       createRequest(`Subscription to ${params.creator}`, false);
       console.log("Success", data);
-    }
+    },
   });
 
   // check for event
@@ -286,18 +251,16 @@ useEffect(() => {
           setStreamId(StreamIdString);
           setStreamOwner(address);
 
-
           console.log("Sender", true);
 
-          
           //post stream id here in database
 
           //redirect to creatorpage
-          notification.success("Subscription created, redirecting to creator content")
+          notification.success("Subscription created, redirecting to creator content");
 
           //replace with new url on deployment
-           router.push(`http://localhost:3000/audiencehub/creator-content/${params.creator}`);
-        
+          router.push(`http://localhost:3000/audiencehub/creator-content/${params.creator}`);
+
           //we check if they are subscriberd, if yes show if no dont show
         }
         const streamId = log.args[3];
@@ -306,8 +269,6 @@ useEffect(() => {
       });
     },
   });
-
-
 
   return (
     <>
@@ -335,30 +296,25 @@ useEffect(() => {
           </div>
         )}
 
-
-        {
-         isStreamOwner && (
+        {isStreamOwner && (
           <div>
             <Link href={"/"}>
-              <button className="btn btn-wide flex justify-center mt-2 btn-primary text-white text-xl"> Go To Creator Content </button>
+              <button className="btn btn-wide flex justify-center mt-2 btn-primary text-white text-xl">
+                {" "}
+                Go To Creator Content{" "}
+              </button>
             </Link>
           </div>
-         )
-
-        }
-        
-
-        
+        )}
 
         <div className="grid grid-cols-1 items-center align-middle">
           <div className="flex justify-center mt-5 font-bold">Merch & Items </div>
           <div className="grid grid-cols-4 space-x-auto  mt-5">
-           {/* //.map, with fetched data, price, image, name, description  */}
-<ShopItem createRequest={createRequest} />
-<ShopItem createRequest={createRequest} />
-<ShopItem createRequest={createRequest} />
-<ShopItem createRequest={createRequest} />
-
+            {/* //.map, with fetched data, price, image, name, description  */}
+            <ShopItem createRequest={createRequest} />
+            <ShopItem createRequest={createRequest} />
+            <ShopItem createRequest={createRequest} />
+            <ShopItem createRequest={createRequest} />
           </div>
         </div>
       </div>
