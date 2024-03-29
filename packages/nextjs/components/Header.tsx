@@ -21,6 +21,10 @@ export const menuLinks: HeaderMenuLink[] = [
     href: "/audiencehub/dashboard",
   },
   {
+    label: "Explore",
+    href: "/audiencehub/explore",
+  },
+  {
     label: "Your Creator Page",
     href: "/audiencehub/robert",
   },
