@@ -17,7 +17,7 @@ import { storageChains } from "~~/config/storage-chains";
 import { useWalletClient } from "wagmi";
 import { providers } from "ethers";
 import { useSendTransaction } from "wagmi";
-import { parseUnits, zeroAddress } from 'viem';
+import { parseEther, parseUnits, zeroAddress } from 'viem';
 import { Web3SignatureProvider } from "@requestnetwork/web3-signature";
 import ShopItem from "~~/components/ShopItem";
 
@@ -108,9 +108,9 @@ async function createRequest() {
         network: "sepolia",
       },
       //PRICE VARIABLE
-      expectedAmount: parseUnits(
+      expectedAmount: parseEther(
    singleItemPrice,
-        18
+      
       ).toString(),
       payee: {
         type: Types.Identity.TYPE.ETHEREUM_ADDRESS,
@@ -185,7 +185,7 @@ async function createRequest() {
    notification.remove(notificationLoadingDeclaring);
 
 
-    await request.declareSentPayment(singleItemPrice, 'sent payment', {
+    await request.declareSentPayment(parseEther(singleItemPrice).toString(), 'sent payment', {
       type: "ethereumAddress" as any,
       value: address as string,
     })

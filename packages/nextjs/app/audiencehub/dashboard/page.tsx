@@ -16,6 +16,7 @@ const Page = () => {
     "011c99c877b6fe4e8b953523c407f85568cc884a3e68cbab47b1a033a2895ec9e9",
     "01b451e626efc609cc07fbb96d68aca853dcb9dcb72d6d8acad04f2fb83b2afabb",
     "0196f638f5f320dd7eb600b1d5d9edd242d29281f5cdee815b29783baa542f3b26",
+    "01ce2ff4994a4652eea39fb007fd19c748bbc4ef5e0580bac46bd655b680d9a7d5"
   ];
 
   const [userType, setUserType] = useState("fan");
