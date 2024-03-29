@@ -15,9 +15,9 @@ const Home: NextPage = () => {
   ];
   return (
     <main className="min-h-screen bg-white text-black">
-      <section id="home" className="pt-20">
-        <div className="lg:px-64">
-          <div className="-mx-4 flex flex-wrap items-center">
+      <section id="home" className="container pt-20 mx-auto max-w-screen-md flex flex-wrap items-center">
+        {/* <div className="lg:px-64">
+          <div className="-mx-4 flex flex-wrap items-center"> */}
             <div className="w-full px-4 lg:w-7/12">
               <div className="wow fadeInUp mb-12 lg:mb-0 lg:max-w-[570px] pl-[100px]" data-wow-delay=".2s">
                 <span className="mb-5 block text-lg font-medium leading-tight text-black  sm:text-[22px] xl:text-[22px]">
@@ -66,8 +66,8 @@ const Home: NextPage = () => {
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
+            {/* </div>
+          </div> */}
         </div>
       </section>
 
