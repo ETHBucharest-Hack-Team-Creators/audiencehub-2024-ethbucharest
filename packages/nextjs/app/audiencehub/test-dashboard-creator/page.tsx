@@ -1,6 +1,6 @@
 import React from 'react'
 import { useAccount } from 'wagmi'
-import Dashboard from '~~/components/dashboard/Dashboard'
+import DashBoardCreator from '~~/components/dashboard/DashboardCreator'
 
 const Page = () => {
 
@@ -8,7 +8,7 @@ const Page = () => {
 
   return (
     <div>
-        <Dashboard  />
+        <DashBoardCreator  />
     </div>
   )
 }
