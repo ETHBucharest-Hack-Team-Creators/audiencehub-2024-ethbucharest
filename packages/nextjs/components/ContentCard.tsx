@@ -6,7 +6,7 @@ import React from "react";
 interface CardProps {
   title: string;
   description: string;
-  imgUrls: string;
+  imgUrls: string[];
   // onClick: () => void;
 }
 
