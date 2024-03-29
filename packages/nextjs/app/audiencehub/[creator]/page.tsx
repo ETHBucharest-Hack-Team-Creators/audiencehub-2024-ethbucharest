@@ -355,7 +355,7 @@ export default function Page({ params }: { params: { creator: string } }) {
   return (
     <>
       <div className="grid grid-cols-1 items-center align-middle mt-12 justify-items-center">
-        <div className="avatar flex justify-center">
+        <div className="avatar flex flex-col justify-center">
           <div className="w-24 mask mask-hexagon">
             {/* //@ts-ignore */}
             {creatorDataState ? <img src={creatorDataState.imgUrl} /> : <div>Loading</div>}
@@ -365,6 +365,7 @@ export default function Page({ params }: { params: { creator: string } }) {
         <div className="flex justify-center mt-5 font-bold">
           {creatorDataState ? creatorDataState.name : params.creator}{" "}
         </div>
+        {creatorDataState && <div>{creatorDataState.price}</div>}
 
         {streamOwner !== false && (
           <div>

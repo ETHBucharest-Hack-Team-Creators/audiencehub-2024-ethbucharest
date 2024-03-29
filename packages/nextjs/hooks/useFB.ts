@@ -353,7 +353,7 @@ export function useFB() {
     isOneTimePayment?: boolean,
     sablierId?: any,
     itemId?: string,
-    creatorAddress?: string
+    creatorAddress?: string,
   ) => {
     if (!db) return;
     if (isOneTimePayment === true) {
@@ -362,7 +362,7 @@ export function useFB() {
           requestid: requestid,
           isOneTimePayment: isOneTimePayment,
           itemId: itemId,
-          creator: creatorAddress
+          creator: creatorAddress,
         });
       } catch (error) {
         console.log(error);
@@ -373,6 +373,7 @@ export function useFB() {
           requestid: requestid,
           isOneTimePayment: isOneTimePayment,
           sablierId: sablierId,
+          creator: creatorAddress,
         });
       } catch (error) {
         console.log(error);
@@ -400,26 +401,26 @@ export function useFB() {
     }
   };
 
-const getRequestFanIds = async (address: string) => {
-  const app = initializeApp(firebaseConfig);
-  const dblocal = getFirestore(app);
-  const requestsData: any = [];
-  // if (!dblocal) return;
-try{
-  console.log(address)
-  const querySnapshot = await getDocs(collection(dblocal, "fan_requestids", address, "requestids"));
-  querySnapshot.forEach((doc) => {
-    // doc.data() is never undefined for query doc snapshots
-    console.log(doc.id, " => ", doc.data());
-    requestsData.push({ ...doc.data() });
+  const getRequestFanIds = async (address: string) => {
+    const app = initializeApp(firebaseConfig);
+    const dblocal = getFirestore(app);
+    const requestsData: any = [];
+    // if (!dblocal) return;
+  try{
+    console.log(address)
+    const querySnapshot = await getDocs(collection(dblocal, "fan_requestids", address, "requestids"));
+    querySnapshot.forEach((doc) => {
+      // doc.data() is never undefined for query doc snapshots
+      console.log(doc.id, " => ", doc.data());
+      requestsData.push({ ...doc.data() });
 
-  });
+    });
 
-  return requestsData;
-} catch(error) {
-console.log(error);
-}
-};
+    return requestsData;
+  } catch(error) {
+  console.log(error);
+  }
+  };
 
   return {
     db,
