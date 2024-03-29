@@ -249,14 +249,14 @@ export default function Page({ params }: { params: { creator: string } }) {
 
         try {
           if (isOneTimePayment === true) {
-            postRequestIdCreator(params.creator, request.requestId, true, 100, itemId);
-            postRequestIdFan(address as string, request.requestId, true, 100, itemId, params.creator);
+            await postRequestIdCreator(params.creator, request.requestId, true, 100, itemId);
+            await postRequestIdFan(address as string, request.requestId, true, 100, itemId, params.creator);
             notification.remove(notificationLoadingDeclaring);
             notification.success("Payment declared successfully");
           } else {
             console.log("Subscription payment");
-            postRequestIdFan(address as string, request.requestId, false, streamId, itemId, params.creator);
-            postRequestIdCreator(params.creator, request.requestId, false, streamId, itemId);
+            await postRequestIdFan(address as string, request.requestId, false, streamId, itemId, params.creator);
+            await postRequestIdCreator(params.creator, request.requestId, false, streamId, itemId);
             notification.remove(notificationLoadingDeclaring);
             notification.success("Payment declared successfully");
             router.push(`/audiencehub/creator-content/${params.creator}`);
