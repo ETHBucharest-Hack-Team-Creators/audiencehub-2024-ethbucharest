@@ -11,16 +11,13 @@ const Home: NextPage = () => {
     { src: "/sponsors/scaffold.jpeg", alt: "scaffold image" },
     { src: "/sponsors/arbitrum.png", alt: "arbitrum image" },
     { src: "/sponsors/base.png", alt: "base image" },
-    { src: "/sponsors/secret.png", alt: "secret image" },
   ];
   return (
     <main className="min-h-screen bg-white text-black">
-      <section id="home" className="container pt-20 mx-auto max-w-screen-md flex flex-wrap items-center">
-        {/* <div className="lg:px-64">
-          <div className="-mx-4 flex flex-wrap items-center"> */}
+      <section id="home" className="container pt-20 mx-auto max-w-screen-xl flex flex-wrap items-center">
         <div className="w-full px-4 lg:w-7/12">
           <div className="wow fadeInUp mb-12 lg:mb-0 lg:max-w-[570px] pl-[100px]" data-wow-delay=".2s">
-            <span className="mb-5 block text-lg font-medium leading-tight text-black  sm:text-[22px] xl:text-[22px]">
+            <span className="mb-5 block text-lg font-medium leading-tight text-black sm:text-[22px] xl:text-[22px]">
               Empowering creators through blockchain.
             </span>
             <h1 className="mb-6 text-3xl font-bold leading-tight text-black  sm:text-[40px] md:text-[50px] lg:text-[42px] xl:text-[50px]">
@@ -36,7 +33,7 @@ const Home: NextPage = () => {
         </div>
 
         <div className="w-full px-4 lg:w-5/12">
-          <div className="wow fadeInUp relative z-10 mx-auto w-full max-w-[530px] lg:mr-0" data-wow-delay=".3s">
+          <div className="wow fadeInUp relative z-9 mx-auto w-full max-w-[530px]" data-wow-delay=".3s">
             <Image
               src="/images/1to1.png"
               width="390"
@@ -44,7 +41,7 @@ const Home: NextPage = () => {
               alt="hero image"
               className="mx-auto max-w-full rounded-full "
             />
-            <div className="max-auto absolute top-0 left-0 right-0 -z-10">
+            <div className="max-auto absolute top-0 left-0 right-0 z-10">
               <div className="absolute top-5 right-0">
                 <svg width="72" height="51" viewBox="0 0 72 51" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <g clipPath="url(#clip0_5_3665)">
@@ -66,8 +63,6 @@ const Home: NextPage = () => {
               </div>
             </div>
           </div>
-          {/* </div>
-          </div> */}
         </div>
       </section>
 
@@ -78,7 +73,7 @@ const Home: NextPage = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-6 gap-20">
+        <div className="grid grid-cols-5 gap-20">
           {images.map((image, index) => (
             <div key={index} className="relative">
               <Image width={60} height={60} src={image.src} alt={image.alt} className="w-full" />
