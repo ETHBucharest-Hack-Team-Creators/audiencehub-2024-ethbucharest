@@ -48,9 +48,6 @@ export default function FanSubscriptionsTab() {
               <div className="font-bold pl-1">Fish man</div>
             </div>
           </div>
-          {/* <th>
-            <button className="btn btn-sm">Close Subscription</button>
-          </th> */}
         </Link>
       ))}
     </div>
