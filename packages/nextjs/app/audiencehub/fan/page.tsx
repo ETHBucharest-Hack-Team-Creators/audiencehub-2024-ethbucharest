@@ -45,6 +45,7 @@ export default function Page() {
             <div role="tabpanel" className="tab-content bg-base-100 border-base-300 rounded-box p-6">
               <div className="overflow-x-auto shadow-md rounded-xl">
                 <table className="table table-zebra-zebra">
+
                   <tbody>
                     {/* row 1 */}
                     <tr>
