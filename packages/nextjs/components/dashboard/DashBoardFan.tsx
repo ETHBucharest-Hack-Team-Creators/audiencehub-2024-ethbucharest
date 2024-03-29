@@ -34,9 +34,10 @@ const DashBoardFan = ({addressOfUser} : any) => {
   const [requestsCreatorIds, setRequestCreatorIds] = useState();
   const [requestsSubscriptionsState, setSubscriptionsState] = useState([]);
     const [requestsOneTimePaymentsState, setOneTimePaymentsState] = useState([]);
+    const [subScriptionsIdsState, setSubScriptionsIdsState] = useState([]);
 
   // get request Ids from database (subscriptions, array of request ids)
-  const {getRequestCreatorIds} = useFB();
+  const {getRequestFanIds} = useFB();
 
   async function getRequestIds(requestsIdArray: string[], isSubscription: boolean) {
     console.log(walletClient);
@@ -79,9 +80,10 @@ const DashBoardFan = ({addressOfUser} : any) => {
            // Set your address here
           const subscriptionsRequestsIds: any = [];
           const oneTimeItemsRequestsIds: any = [];
+          const subscriptionSablierIds: any = [];
 
           console.log(address);
-          const itemsData = await getRequestCreatorIds(address as string);
+          const itemsData = await getRequestFanIds(address as string);
           setRequestCreatorIds(itemsData as any);
           console.log("-----------CREATOR DATA------------");
           console.log(itemsData);
@@ -91,13 +93,17 @@ const DashBoardFan = ({addressOfUser} : any) => {
             if(itemsData[i].OneTimePayment === true || itemsData[i].isOneTimePayment) {
               console.log(itemsData[i])
                 oneTimeItemsRequestsIds.push(itemsData[i].requestid);
+           
                 
                 console.log(`Pushed ${itemsData[i].requestid} to one time payments, is one time payment : ${itemsData[i].oneTimePayment}`)
             } else {
                 subscriptionsRequestsIds.push(itemsData[i].requestid);
+              subscriptionSablierIds.push(itemsData[i].sablierId);
        
             }
           }
+
+          setSubScriptionsIdsState(subscriptionSablierIds);
           
           await getRequestIds(oneTimeItemsRequestsIds, false)
           await getRequestIds(subscriptionsRequestsIds, true)
@@ -159,6 +165,9 @@ const DashBoardFan = ({addressOfUser} : any) => {
                   <td>
                     <div className="font-bold pl-1">Action</div>
                   </td>
+                  <td>
+                    <div className="font-bold pl-1">Cancel Subscription</div>
+                  </td>
                 </tr>
                 {requestsSubscriptionsState ? (
                   requestsSubscriptionsState.map((request: any, index) => (
@@ -174,8 +183,8 @@ const DashBoardFan = ({addressOfUser} : any) => {
                         <div className="font-bold pl-1">
                           {request.requestData.extensionsData.some(
   (data : any) => data.action === "declareReceivedPayment"
-)
-                            ? "Declared"
+) === false
+                            ? "Creator needs to declare"
                             : request.requestData.state}
                         </div>
                       </td>
@@ -220,7 +229,7 @@ const DashBoardFan = ({addressOfUser} : any) => {
                               </div>
                             )}
 
-                            {
+                            {/* {
                              request.requestData.extensionsData.some(
                               (data : any) => data.action === "declareReceivedPayment"
                             ) === false && request.requestData.state === "created" &&  <button
@@ -235,8 +244,11 @@ const DashBoardFan = ({addressOfUser} : any) => {
                             >
                               Sign Receipt
                             </button>
-                            }
+                            } */}
                         </div>
+                      </td>
+                      <td>
+                      <CancelSablier streamId={subScriptionsIdsState && subScriptionsIdsState[index]} />
                       </td>
                     </tr>
                   ))
@@ -288,8 +300,8 @@ const DashBoardFan = ({addressOfUser} : any) => {
                         <div className="font-bold pl-1">
                         {request.requestData.extensionsData.some(
   (data : any) => data.action === "declareReceivedPayment"
-)
-                            ? "Declared"
+) === false
+                            ? "Creator needs to declare"
                             : request.requestData.state}
                         </div>
                       </td>
@@ -334,7 +346,7 @@ const DashBoardFan = ({addressOfUser} : any) => {
                               </div>
                             )}
 
-                            {
+                            {/* {
                                request.requestData.extensionsData.some(
                                 (data : any) => data.action === "declareReceivedPayment"
                               ) === false && request.requestData.state === "created" &&   <button
@@ -349,7 +361,7 @@ const DashBoardFan = ({addressOfUser} : any) => {
                             >
                               Sign Receipt
                             </button>
-                            }
+                            } */}
                         </div>
                       </td>
                     </tr>
