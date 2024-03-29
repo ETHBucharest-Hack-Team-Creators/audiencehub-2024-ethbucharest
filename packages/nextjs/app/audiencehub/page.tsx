@@ -18,21 +18,27 @@ type Creator = {
 const Page = () => {
   const { getCreators } = useFB();
   const [creators, setCreators] = useState<Creator[]>([]);
+  const [loading, setLoading] = useState(true);
   const { address } = useAccount();
 
   useEffect(() => {
+    setLoading(true);
     const fetchCreators = async () => {
       try {
         const creatorsData = await getCreators();
         setCreators(creatorsData);
       } catch (e) {
         console.error(e);
+      } finally {
+        setLoading(false);
       }
     };
     fetchCreators();
   }, [address]);
 
-  return (
+  return loading ? (
+    <h1 className="flex justify-center pt-10">Loading...</h1>
+  ) : (
     <div className="flex flex-col px-12 pt-4">
       <div className="flex flex-row gap-3 py-8 justify-center">
         <StarIcon className="w-10 h-10 text-yellow-500 -m-1" />
