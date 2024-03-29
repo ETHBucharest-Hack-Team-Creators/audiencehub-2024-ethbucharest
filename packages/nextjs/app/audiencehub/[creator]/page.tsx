@@ -1,21 +1,16 @@
 "use client";
 
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { RequestNetwork, Types, Utils } from "@requestnetwork/request-client.js";
 import { Web3SignatureProvider } from "@requestnetwork/web3-signature";
-import { providers } from "ethers";
 import { parseEther, parseUnits, zeroAddress } from "viem";
-import { getTransactionReceipt } from "viem/_types/actions/public/getTransactionReceipt";
-import { waitForTransactionReceipt } from "viem/_types/actions/public/waitForTransactionReceipt";
-import { useAccount, useWaitForTransaction } from "wagmi";
+import { useAccount } from "wagmi";
 import { useWalletClient } from "wagmi";
 import { useSendTransaction } from "wagmi";
 import ApproveToken from "~~/components/ApproveToken";
-import { BuyNow } from "~~/components/BuyNow";
 import ShopItem from "~~/components/ShopItem";
-import { BlockieAvatar } from "~~/components/scaffold-eth";
 import { currencies } from "~~/config/currency";
 import { storageChains } from "~~/config/storage-chains";
 import { useScaffoldContractRead, useScaffoldContractWrite, useScaffoldEventSubscriber } from "~~/hooks/scaffold-eth";
@@ -289,7 +284,7 @@ export default function Page({ params }: { params: { creator: string } }) {
   const { writeAsync, isMining } = useScaffoldContractWrite({
     contractName: "Sablier",
     functionName: "createWithDurations",
-    
+
     args: [
       [
         address,
@@ -360,7 +355,9 @@ export default function Page({ params }: { params: { creator: string } }) {
 
         {streamOwner !== false && (
           <div>
+
             {true ? (
+
               //Subscribe button Sablier
               <button
                 className="btn btn-wide flex justify-center mt-2 btn-primary text-white text-xl"

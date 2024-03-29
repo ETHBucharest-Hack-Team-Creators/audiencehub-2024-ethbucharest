@@ -13,6 +13,7 @@ import {
   where,
 } from "firebase/firestore";
 import { type FirebaseStorage, getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
+import { get } from "http";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -40,9 +41,14 @@ export function useFB() {
     setStorage(_storage);
   }, []);
 
+  const getDb = () => {
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    return db;
+  };
+
   // CREATORS
   const getCreatorData = async (address: string) => {
-    
     const app = initializeApp(firebaseConfig);
 
     const dblocal = getFirestore(app);
@@ -98,6 +104,22 @@ export function useFB() {
     });
   };
 
+  const getCreators = async () => {
+    if (!db) return;
+    console.log("getCreators");
+    const creatorsRef = collection(db, "creators");
+
+    const q = query(creatorsRef);
+
+    const querySnapshot = await getDocs(q);
+    const creators: any = [];
+    querySnapshot.forEach(doc => {
+      creators.push(doc.data());
+    });
+    console.log(creators);
+    return creators;
+  };
+
   // CONTENT
   const postContent = async (address: string, title: string, description: string, imgUrls: (string | undefined)[]) => {
     const id = `${address}_${Date.now()}`;
@@ -115,17 +137,14 @@ export function useFB() {
   };
 
   const getCreatorContents = async (address: string) => {
-    if (!db) return;
-    console.log("getContents");
-    const contentsRef = collection(db, "contents");
+    const dbLocal = db ?? getDb();
 
+    const contentsRef = collection(dbLocal, "contents");
     const q = query(contentsRef, where("creator", "==", address));
 
     const querySnapshot = await getDocs(q);
     const contents: any = [];
     querySnapshot.forEach(doc => {
-      // doc.data() is never undefined for query doc snapshots
-      // console.log(doc.id, " => ", doc.data());
       contents.push({ id: doc.id, ...doc.data() });
     });
     return contents;
@@ -164,13 +183,11 @@ export function useFB() {
   };
 
   const getItems = async (address: string) => {
- 
     const app = initializeApp(firebaseConfig);
 
     const dblocal = getFirestore(app);
 
-
-    console.log("db")
+    console.log("db");
     if (!dblocal) return;
     console.log("getItems");
     const contentsRef = collection(dblocal, "items");
@@ -182,7 +199,7 @@ export function useFB() {
     querySnapshot.forEach(doc => {
       // doc.data() is never undefined for query doc snapshots
       // console.log(doc.id, " => ", doc.data());
-      console.log(doc.data())
+      console.log(doc.data());
       contents.push({ id: doc.id, ...doc.data() });
     });
     return contents;
@@ -199,6 +216,21 @@ export function useFB() {
     return downloadUrls;
   };
 
+  // REQUESTS
+  const getStreamingRequests = async (address: string) => {
+    if (!db) return;
+    console.log("getRequests");
+    const requestsRef = collection(db, "creator_requestids", address, "requestids");
+
+    const q = query(requestsRef, where("isOneTimePayment", "==", false));
+
+    const querySnapshot = await getDocs(q);
+    const requests: any = [];
+    querySnapshot.forEach(doc => {
+      requests.push(doc.data());
+    });
+    return requests;
+  };
 
   // const postSablierId = async(address: string, sablierId: string) => {
   //   if (!db) return;
@@ -207,62 +239,67 @@ export function useFB() {
   //   })
   // }
 
-  const postRequestIdCreator = async(address: string, requestid: string, isOneTimePayment?: Boolean, sablierId?: any, itemId?: any ) => {
+  const postRequestIdCreator = async (
+    address: string,
+    requestid: string,
+    isOneTimePayment?: boolean,
+    sablierId?: any,
+    itemId?: any,
+  ) => {
     if (!db) return;
-    if(isOneTimePayment === true) {
-
+    if (isOneTimePayment === true) {
       try {
-    await setDoc(doc(db, "creator_requestids",address ,"requestids", requestid), {
-      requestid: requestid,
-      isOneTimePayment: isOneTimePayment,
-      itemId: itemId
- 
-    })
-  } catch(error) {
-    console.log(error)
-  } 
-  
-  } else {
-    try {
-      await setDoc(doc(db, "creator_requestids",address ,"requestids", requestid), {
-        requestid: requestid,
-        isOneTimePayment: isOneTimePayment,
-        sablierId: sablierId
-      })
-    } catch(error) {
-      console.log(error)
-    } 
-  }
-}
+        await setDoc(doc(db, "creator_requestids", address, "requestids", requestid), {
+          requestid: requestid,
+          isOneTimePayment: isOneTimePayment,
+          itemId: itemId,
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    } else {
+      try {
+        await setDoc(doc(db, "creator_requestids", address, "requestids", requestid), {
+          requestid: requestid,
+          isOneTimePayment: isOneTimePayment,
+          sablierId: sablierId,
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
 
-
-const postRequestIdFan = async(address: string, requestid: string, isOneTimePayment?: Boolean, sablierId?: any, itemId?:string ) => {
-  if (!db) return;
-  if(isOneTimePayment === true) {
-
-    try {
-  await setDoc(doc(db, "fan_requestids",address ,"requestids", requestid), {
-    requestid: requestid,
-    isOneTimePayment: isOneTimePayment,
-    itemId: itemId
-
-  })
-} catch(error) {
-  console.log(error)
-} 
-
-} else {
-  try {
-    await setDoc(doc(db, "fan_requestids",address ,"requestids", requestid), {
-      requestid: requestid,
-      isOneTimePayment: isOneTimePayment,
-      sablierId: sablierId
-    })
-  } catch(error) {
-    console.log(error)
-  } 
-}
-}
+  const postRequestIdFan = async (
+    address: string,
+    requestid: string,
+    isOneTimePayment?: boolean,
+    sablierId?: any,
+    itemId?: string,
+  ) => {
+    if (!db) return;
+    if (isOneTimePayment === true) {
+      try {
+        await setDoc(doc(db, "fan_requestids", address, "requestids", requestid), {
+          requestid: requestid,
+          isOneTimePayment: isOneTimePayment,
+          itemId: itemId,
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    } else {
+      try {
+        await setDoc(doc(db, "fan_requestids", address, "requestids", requestid), {
+          requestid: requestid,
+          isOneTimePayment: isOneTimePayment,
+          sablierId: sablierId,
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
 
 const getRequestCreatorIds = async (address: string) => {
   const app = initializeApp(firebaseConfig);
@@ -292,6 +329,7 @@ console.log(error);
     getCreatorData,
     postCreator,
     updateCreator,
+    getCreators,
 
     postContent,
     getCreatorContents,
@@ -301,6 +339,8 @@ console.log(error);
     getItems,
 
     uploadImages,
+
+    getStreamingRequests,
     postRequestIdFan,
     postRequestIdCreator,
     getRequestCreatorIds,

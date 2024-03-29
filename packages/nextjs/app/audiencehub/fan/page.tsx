@@ -1,35 +1,49 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import { useAccount } from "wagmi";
+import { useFB } from "~~/hooks/useFB";
+import { notification } from "~~/utils/scaffold-eth";
 
-const Page = () => {
-  const [userType, setUserType] = React.useState("fan");
+export default function Page() {
+  const { address } = useAccount();
+  const { getStreamingRequests } = useFB();
+  const [requests, setRequests] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (!address) return;
+    const fetchData = async (address: string) => {
+      try {
+        const requests = await getStreamingRequests(address);
+        setRequests(requests);
+        console.log(requests);
+      } catch (error) {
+        notification.error("Something went wrong");
+      }
+    };
+    fetchData(address);
+  }, [address]);
+
+  // State to track the currently active tab index
+  const [activeTabIndex, setActiveTabIndex] = useState<number>(1); // Default to first tab as active
+
   return (
-    <>
-      <div className="flex py-8 justify-center gap-5">
-        <button
-          className="btn btn-wide flex justify-center mt-2 btn-primary text-white text-xl"
-          onClick={() => {
-            setUserType("fan");
-          }}
-        >
-          Fan
-        </button>
-        <button
-          className="btn btn-wide flex justify-center mt-2 btn-primary text-white text-xl"
-          onClick={() => {
-            setUserType("creator");
-          }}
-        >
-          Creator
-        </button>
-      </div>
-      <div className="px-12 pt-5">
-        {(() => {
-          if (userType === "fan") {
-            return (
-              <div className="overflow-x-auto shadow-md">
+    <div className="py-5 px-2">
+      <div role="tablist" className="tabs tabs-lifted">
+        <React.Fragment key="1">
+          <input
+            type="radio"
+            name="my_tabs_1"
+            role="tab"
+            className="tab"
+            aria-label="Your Subscriptions"
+            checked={activeTabIndex === 1}
+            onChange={() => setActiveTabIndex(1)} // Set this tab as active when changed
+          />
+          {activeTabIndex === 1 && (
+            <div role="tabpanel" className="tab-content bg-base-100 border-base-300 rounded-box p-6">
+              <div className="overflow-x-auto shadow-md rounded-xl">
                 <table className="table table-zebra-zebra">
                   <tbody>
                     {/* row 1 */}
@@ -111,63 +125,28 @@ const Page = () => {
                   </tbody>
                 </table>
               </div>
-            );
-          } else {
-            return (
-              <>
-                <div>
-                  <h1 className="text-3xl pb-4">Your Loyal Fans</h1>
-                </div>
-                <div className="overflow-x-auto shadow-md">
-                  <table className="table table-zebra-zebra">
-                    <tbody>
-                      {/* row 1 */}
-                      <tr>
-                        <td>
-                          <div className="font-bold pl-1">0x82A29547CA8970c2aDECF4C2db7e364339f9a4B7</div>
-                        </td>
-                        <td>
-                          <div className="font-bold pl-1">Closed</div>
-                        </td>
-                        <td>
-                          <div className="font-bold pl-1">
-                            <button className="btn btn-sm">Sign Receipt</button>
-                          </div>
-                        </td>
-                      </tr>
-                      {/* row 2 */}
-                      <tr>
-                        <td>
-                          <div className="font-bold pl-1">blackicon.eth</div>
-                        </td>
-                        <td>
-                          <div className="font-bold pl-1">Closed</div>
-                        </td>
-                        <td>
-                          <div className="font-bold pl-1">
-                            <button className="btn btn-sm">See Receipt</button>
-                          </div>
-                        </td>
-                      </tr>
-                      {/* row 3 */}
-                      <tr>
-                        <td>
-                          <div className="font-bold pl-1">vitalik.eth</div>
-                        </td>
-                        <td>
-                          <div className="font-bold pl-1">Expiring in 30 days</div>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </>
-            );
-          }
-        })()}
+            </div>
+          )}
+        </React.Fragment>
+        <React.Fragment key="2">
+          <input
+            type="radio"
+            name="my_tabs_2"
+            role="tab"
+            className="tab"
+            aria-label="Your Items"
+            checked={activeTabIndex === 2}
+            onChange={() => setActiveTabIndex(2)} // Set this tab as active when changed
+          />
+          {activeTabIndex === 2 && (
+            <div role="tabpanel" className="tab-content bg-base-100 border-base-300 rounded-box p-6">
+              {requests.map((request: any, index: number) => (
+                <div key={index}>{request.requestid}</div>
+              ))}
+            </div>
+          )}
+        </React.Fragment>
       </div>
-    </>
+    </div>
   );
-};
-
-export default Page;
+}

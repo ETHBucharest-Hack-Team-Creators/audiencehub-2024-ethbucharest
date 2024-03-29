@@ -8,11 +8,11 @@ module.exports = {
     themes: [
       {
         light: {
-          primary: "#FFD700",              /* Sunshine Yellow */
+          primary: "#FFD700" /* Sunshine Yellow */,
           "primary-content": "#FFFFFF",
-          secondary: "#FFDB58",            /* Mustard Yellow */
+          secondary: "#FFDB58" /* Mustard Yellow */,
           "secondary-content": "#FFDB58",
-          accent: "#93BBFB",               /* Sky Blue */
+          accent: "#93BBFB" /* Sky Blue */,
           "accent-content": "#212638",
           neutral: "#212638",
           "neutral-content": "#ffffff",
@@ -20,13 +20,13 @@ module.exports = {
           "base-200": "#f4f8ff",
           "base-300": "#DAE8FF",
           "base-content": "#212638",
-          info: "#93BBFB",                 /* Sky Blue */
+          info: "#93BBFB" /* Sky Blue */,
           success: "#34EEB6",
           warning: "#FFCF72",
           error: "#FF8863",
-        
+
           "--rounded-btn": "9999rem",
-        
+
           ".tooltip": {
             "--tooltip-tail": "6px",
           },

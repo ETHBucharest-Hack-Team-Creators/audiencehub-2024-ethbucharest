@@ -15,59 +15,59 @@ const Home: NextPage = () => {
   ];
   return (
     <main className="min-h-screen bg-white text-black">
-      <section id="home" className="pt-20">
-        <div className="lg:px-64">
-          <div className="-mx-4 flex flex-wrap items-center">
-            <div className="w-full px-4 lg:w-7/12">
-              <div className="wow fadeInUp mb-12 lg:mb-0 lg:max-w-[570px] pl-[100px]" data-wow-delay=".2s">
-                <span className="mb-5 block text-lg font-medium leading-tight text-black  sm:text-[22px] xl:text-[22px]">
-                  Empowering creators through blockchain.
-                </span>
-                <h1 className="mb-6 text-3xl font-bold leading-tight text-black  sm:text-[40px] md:text-[50px] lg:text-[42px] xl:text-[50px]">
-                  Using
-                  <span className="inline text-[#32c89b] bg-clip-text mx-2">Request Network</span>
-                  and
-                  <span className="inline text-[#fe7f01] bg-clip-text mx-2">Sablier</span>
-                </h1>
-                <p className="mb-10 max-w-[475px] text-base leading-relaxed text-body">
-                  Support your favourite content creator with crypto.
-                </p>
-              </div>
-            </div>
+      <section id="home" className="container pt-20 mx-auto max-w-screen-md flex flex-wrap items-center">
+        {/* <div className="lg:px-64">
+          <div className="-mx-4 flex flex-wrap items-center"> */}
+        <div className="w-full px-4 lg:w-7/12">
+          <div className="wow fadeInUp mb-12 lg:mb-0 lg:max-w-[570px] pl-[100px]" data-wow-delay=".2s">
+            <span className="mb-5 block text-lg font-medium leading-tight text-black  sm:text-[22px] xl:text-[22px]">
+              Empowering creators through blockchain.
+            </span>
+            <h1 className="mb-6 text-3xl font-bold leading-tight text-black  sm:text-[40px] md:text-[50px] lg:text-[42px] xl:text-[50px]">
+              Using
+              <span className="inline text-[#32c89b] bg-clip-text mx-2">Request Network</span>
+              and
+              <span className="inline text-[#fe7f01] bg-clip-text mx-2">Sablier</span>
+            </h1>
+            <p className="mb-10 max-w-[475px] text-base leading-relaxed text-body">
+              Support your favourite content creator with crypto.
+            </p>
+          </div>
+        </div>
 
-            <div className="w-full px-4 lg:w-5/12">
-              <div className="wow fadeInUp relative z-10 mx-auto w-full max-w-[530px] lg:mr-0" data-wow-delay=".3s">
-                <Image
-                  src="/images/1to1.png"
-                  width="390"
-                  height="750"
-                  alt="hero image"
-                  className="mx-auto max-w-full rounded-full "
-                />
-                <div className="max-auto absolute top-0 left-0 right-0 -z-10">
-                  <div className="absolute top-5 right-0">
-                    <svg width="72" height="51" viewBox="0 0 72 51" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <g clipPath="url(#clip0_5_3665)">
-                        <path
-                          d="M22.378 0.4157C22.3814 0.342879 22.3851 0.270712 22.3891 0.199219C22.3857 0.271606 22.382 0.343766 22.378 0.4157C22.0401 7.83785 25.7079 22.0514 43.163 21.2025C36.0333 21.7022 21.9045 26.7677 22.3875 43.0291C22.1659 35.9367 17.5749 21.9221 1.00683 21.8442C0.856728 21.8465 0.709534 21.8469 0.56543 21.8454C0.713499 21.8439 0.86063 21.8435 1.00683 21.8442C8.04005 21.7355 21.4537 17.3609 22.378 0.4157Z"
-                          fill="#ff0050"
-                        />
-                        <path
-                          d="M59.3487 24.4888C59.3506 24.4451 59.3528 24.4018 59.3552 24.3589C59.3532 24.4023 59.351 24.4456 59.3487 24.4888C59.1459 28.942 61.3466 37.4702 71.8196 36.9608C67.5418 37.2606 59.0645 40.3 59.3543 50.0568C59.2213 45.8014 56.4667 37.3926 46.5259 37.3459C46.4359 37.3473 46.3475 37.3475 46.261 37.3466C46.3499 37.3457 46.4382 37.3454 46.5259 37.3459C50.7458 37.2807 58.794 34.6559 59.3487 24.4888Z"
-                          fill="#1e293b"
-                        />
-                      </g>
-                      <defs>
-                        <clipPath id="clip0_5_3665">
-                          <rect width="71.2541" height="49.8779" fill="white" transform="translate(0.56543 0.199219)" />
-                        </clipPath>
-                      </defs>
-                    </svg>
-                  </div>
-                </div>
+        <div className="w-full px-4 lg:w-5/12">
+          <div className="wow fadeInUp relative z-10 mx-auto w-full max-w-[530px] lg:mr-0" data-wow-delay=".3s">
+            <Image
+              src="/images/1to1.png"
+              width="390"
+              height="750"
+              alt="hero image"
+              className="mx-auto max-w-full rounded-full "
+            />
+            <div className="max-auto absolute top-0 left-0 right-0 -z-10">
+              <div className="absolute top-5 right-0">
+                <svg width="72" height="51" viewBox="0 0 72 51" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <g clipPath="url(#clip0_5_3665)">
+                    <path
+                      d="M22.378 0.4157C22.3814 0.342879 22.3851 0.270712 22.3891 0.199219C22.3857 0.271606 22.382 0.343766 22.378 0.4157C22.0401 7.83785 25.7079 22.0514 43.163 21.2025C36.0333 21.7022 21.9045 26.7677 22.3875 43.0291C22.1659 35.9367 17.5749 21.9221 1.00683 21.8442C0.856728 21.8465 0.709534 21.8469 0.56543 21.8454C0.713499 21.8439 0.86063 21.8435 1.00683 21.8442C8.04005 21.7355 21.4537 17.3609 22.378 0.4157Z"
+                      fill="#ff0050"
+                    />
+                    <path
+                      d="M59.3487 24.4888C59.3506 24.4451 59.3528 24.4018 59.3552 24.3589C59.3532 24.4023 59.351 24.4456 59.3487 24.4888C59.1459 28.942 61.3466 37.4702 71.8196 36.9608C67.5418 37.2606 59.0645 40.3 59.3543 50.0568C59.2213 45.8014 56.4667 37.3926 46.5259 37.3459C46.4359 37.3473 46.3475 37.3475 46.261 37.3466C46.3499 37.3457 46.4382 37.3454 46.5259 37.3459C50.7458 37.2807 58.794 34.6559 59.3487 24.4888Z"
+                      fill="#1e293b"
+                    />
+                  </g>
+                  <defs>
+                    <clipPath id="clip0_5_3665">
+                      <rect width="71.2541" height="49.8779" fill="white" transform="translate(0.56543 0.199219)" />
+                    </clipPath>
+                  </defs>
+                </svg>
               </div>
             </div>
           </div>
+          {/* </div>
+          </div> */}
         </div>
       </section>
 
