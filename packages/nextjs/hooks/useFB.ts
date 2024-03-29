@@ -13,7 +13,6 @@ import {
   where,
 } from "firebase/firestore";
 import { type FirebaseStorage, getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
-import { get } from "http";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
