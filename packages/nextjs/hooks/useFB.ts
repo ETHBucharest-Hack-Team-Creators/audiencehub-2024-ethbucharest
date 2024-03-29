@@ -13,6 +13,7 @@ import {
   where,
 } from "firebase/firestore";
 import { type FirebaseStorage, getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
+import { get } from "http";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -39,6 +40,12 @@ export function useFB() {
     setDb(_db);
     setStorage(_storage);
   }, []);
+
+  const getDb = () => {
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    return db;
+  };
 
   // CREATORS
   const getCreatorData = async (address: string) => {
@@ -130,17 +137,14 @@ export function useFB() {
   };
 
   const getCreatorContents = async (address: string) => {
-    if (!db) return;
-    console.log("getContents");
-    const contentsRef = collection(db, "contents");
+    const dbLocal = db ?? getDb();
 
+    const contentsRef = collection(dbLocal, "contents");
     const q = query(contentsRef, where("creator", "==", address));
 
     const querySnapshot = await getDocs(q);
     const contents: any = [];
     querySnapshot.forEach(doc => {
-      // doc.data() is never undefined for query doc snapshots
-      // console.log(doc.id, " => ", doc.data());
       contents.push({ id: doc.id, ...doc.data() });
     });
     return contents;
