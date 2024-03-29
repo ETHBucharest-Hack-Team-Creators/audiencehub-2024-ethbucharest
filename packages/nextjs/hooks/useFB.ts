@@ -187,6 +187,43 @@ export function useFB() {
     return downloadUrls;
   };
 
+
+  // const postSablierId = async(address: string, sablierId: string) => {
+  //   if (!db) return;
+  //   await setDoc(doc(db, "creator_requestids_sablierids", address, "sablierids",sablierId), {
+  //     sablierId: sablierId,
+  //   })
+  // }
+
+  const postRequestId = async(address: string, requestid: string, isOneTimePayment?: Boolean, sablierId?: any) => {
+    if (!db) return;
+    if(isOneTimePayment === true) {
+
+      try {
+    await setDoc(doc(db, "creator_requestids",address ,"requestids", requestid), {
+      requestid: requestid,
+      isOneTimePaymnet: isOneTimePayment,
+ 
+    })
+  } catch(error) {
+    console.log(error)
+  } 
+    
+
+  
+  } else {
+    try {
+      await setDoc(doc(db, "creator_requestids",address ,"requestids", requestid), {
+        requestid: requestid,
+        isOneTimePaymnet: isOneTimePayment,
+        sablierId: sablierId
+      })
+    } catch(error) {
+      console.log(error)
+    } 
+  }
+}
+
   return {
     db,
     storage,
@@ -203,5 +240,7 @@ export function useFB() {
     getItems,
 
     uploadImages,
+
+    postRequestId,
   };
 }
