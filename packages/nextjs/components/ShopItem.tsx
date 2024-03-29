@@ -1,28 +1,12 @@
 import { useEffect } from "react";
-import { waitForTransaction } from "@wagmi/core";
-import { parseUnits } from "ethers/lib/utils";
-import { notification } from "~~/utils/scaffold-eth";
 
-const ShopItem = ({
-  createRequest,
-  sendTransaction,
-  address,
-  isTxSuccess,
-  isTxError,
-  requestDataProps,
-  addressOfUser,
-  hash,
-}: any) => {
-  function delay(ms: number) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
-
+const ShopItem = ({ createRequest, requestDataProps, title, image, description, price, itemId }: any) => {
   useEffect(() => {
     console.log(requestDataProps);
   }, [requestDataProps]);
 
   const handleClick = async () => {
-    await createRequest("Item bought", true);
+    await createRequest("Item bought", true, 100, itemId, price);
 
     // if(isTxError) {
     //   console.log('tx error')
@@ -46,15 +30,12 @@ const ShopItem = ({
   return (
     <div className="card w-72 bg-base-100 shadow-xl mx-5">
       <figure className="px-10 pt-10">
-        <img
-          src="https://daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.jpg"
-          alt="Shoes"
-          className="rounded-xl"
-        />
+        <img src={image} alt="Shoes" className="rounded-xl" />
       </figure>
       <div className="card-body items-center text-center">
-        <h2 className="card-title">Shoes!</h2>
-        <p>If a dog chews shoes whose shoes does he choose?</p>
+        <h2 className="card-title">{title}</h2>
+        <p>{description}</p>
+        <p>{price}</p>
         <div className="card-actions">
           <button className="btn btn-primary" onClick={handleClick}>
             Request

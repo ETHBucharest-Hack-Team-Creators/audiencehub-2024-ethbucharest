@@ -5,20 +5,16 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { RequestNetwork, Types, Utils } from "@requestnetwork/request-client.js";
 import { Web3SignatureProvider } from "@requestnetwork/web3-signature";
-import { providers } from "ethers";
 import { parseEther, parseUnits, zeroAddress } from "viem";
-import { getTransactionReceipt } from "viem/_types/actions/public/getTransactionReceipt";
-import { waitForTransactionReceipt } from "viem/_types/actions/public/waitForTransactionReceipt";
-import { useAccount, useWaitForTransaction } from "wagmi";
+import { useAccount } from "wagmi";
 import { useWalletClient } from "wagmi";
 import { useSendTransaction } from "wagmi";
 import ApproveToken from "~~/components/ApproveToken";
-import { BuyNow } from "~~/components/BuyNow";
 import ShopItem from "~~/components/ShopItem";
-import { BlockieAvatar } from "~~/components/scaffold-eth";
 import { currencies } from "~~/config/currency";
 import { storageChains } from "~~/config/storage-chains";
 import { useScaffoldContractRead, useScaffoldContractWrite, useScaffoldEventSubscriber } from "~~/hooks/scaffold-eth";
+import { useFB } from "~~/hooks/useFB";
 import { notification } from "~~/utils/scaffold-eth";
 
 export default function Page({ params }: { params: { creator: string } }) {
@@ -29,9 +25,10 @@ export default function Page({ params }: { params: { creator: string } }) {
   const [streamId, setStreamId] = useState("") as any;
   const [streamOwner, setStreamOwner] = useState("") as any;
   const [isStreamOwner, setIsStreamOnwer] = useState(false) as any;
-  const [requestDataProps, setRequestDataProps] = useState({} as any);
+  const [requestDataProps, setRequestDataProps] = useState();
 
   const router = useRouter() as any;
+
   function delay(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
@@ -57,26 +54,84 @@ export default function Page({ params }: { params: { creator: string } }) {
 
   const { data: walletClient } = useWalletClient();
   const [currency, setCurrency] = useState(currencies.keys().next().value);
-  const [expectedAmount, setExpectedAmount] = useState("");
+  const [creatorItemsState, setCreatorItemsState] = useState([]);
 
   const [status, setStatus] = useState(APP_STATUS.AWAITING_INPUT);
   const [storageChain, setStorageChain] = useState(storageChains.keys().next().value);
 
+  const [creatorDataState, setCreatorDataState] = useState({} as any);
+
   const [requestData, setRequestData] = useState<Types.IRequestDataWithEvents>();
+
+  const [requestIdState, setRequestIdState] = useState("");
   //IT'S ABOUT PROVIDER
   //AMOUNT IS 10 DAI , TO MODIFY WITH PARAMETERS
 
+  let requestDataForDb: any;
+
   const { address } = useAccount();
 
-  const singleItemPrice = "0.005";
-  const subscriptionPrice = parseUnits(singleItemPrice, 18);
+  const { postRequestIdCreator, postRequestIdFan, getItems, getCreatorData } = useFB();
+  // const items =  getItems(params.creator);
+
+  //GET ITEMS DATA FROM CREATOR
+  // items -> address ( creator ) -> items ids
+  // display them
+
+  //FETCH CREATOR PROFILE DISPLAY PROFILE PICTURE
+
+  useEffect(() => {
+    const fetchDataItems = async () => {
+      try {
+        const address = params.creator; // Set your address here
+        console.log(address);
+        const itemsData = await getItems(params.creator);
+        setCreatorItemsState(itemsData);
+        console.log(itemsData);
+      } catch (error) {
+        console.error("Error fetching items:", error);
+      }
+    };
+
+    const fetchDataCreator = async () => {
+      try {
+        const address = params.creator; // Set your address here
+        console.log(address);
+        const itemsData = await getCreatorData(params.creator);
+        setCreatorDataState(itemsData as any);
+        console.log("-----------CREATOR DATA------------");
+        console.log(itemsData);
+      } catch (error) {
+        console.error("Error fetching items:", error);
+      }
+    };
+
+    fetchDataCreator();
+    fetchDataItems(); // Call fetchData when component mounts
+    console.log("-------------CREATOR DATA STATE-------------");
+    console.log(creatorDataState);
+  }, []); // Empty dependency array ensures this effect runs only once
+
+  useEffect(() => {}, [creatorItemsState]);
+
+  //FETCH FROM DB
+  // const singleItemPrice = "0.005";
+  //FETCH FROM DB
+  const subscriptionPriceForRequest: string = "1";
+  const subscriptionPrice = parseUnits(subscriptionPriceForRequest, 18);
 
   const payeeIdentity = address as string;
   const payerIdentity = address;
   const paymentRecipient = payeeIdentity;
   const feeRecipient = "0x0000000000000000000000000000000000000000";
 
-  async function createRequest(reason: string, isOneTimePayment: boolean) {
+  async function createRequest(
+    reason: string,
+    isOneTimePayment: boolean,
+    streamId?: string,
+    itemId?: string,
+    price?: any,
+  ) {
     const signatureProvider = new Web3SignatureProvider(walletClient);
     const requestClient = new RequestNetwork({
       nodeConnectionConfig: {
@@ -90,12 +145,12 @@ export default function Page({ params }: { params: { creator: string } }) {
     const requestCreateParameters: Types.ICreateRequestParameters = {
       requestInfo: {
         currency: {
-          type: Types.RequestLogic.CURRENCY.ERC20,
+          type: isOneTimePayment ? Types.RequestLogic.CURRENCY.ETH : Types.RequestLogic.CURRENCY.ERC20,
           value: "0x776b6fC2eD15D6Bb5Fc32e0c89DE68683118c62A",
           network: "sepolia",
         },
         //PRICE VARIABLE
-        expectedAmount: parseEther(singleItemPrice).toString(),
+        expectedAmount: isOneTimePayment ? parseEther(price).toString() : parseEther(price).toString(),
         payee: {
           type: Types.Identity.TYPE.ETHEREUM_ADDRESS,
           value: address as string,
@@ -137,22 +192,29 @@ export default function Page({ params }: { params: { creator: string } }) {
       const request = await requestClient.createRequest(requestCreateParameters);
 
       notification.remove(notificationId);
-      const nofiticationIdPersisting = notification.loading("  Persisting on chain");
+      const nofiticationIdPersisting: any = notification.loading("  Persisting on chain");
+      requestDataForDb = request.requestId;
+      setRequestIdState(request.requestId);
+      console.log("-----------REQUEST DATA SENT TO SABLIER DB PERSISTING ON CHAIN------------");
+      console.log(requestIdState);
+      console.log(requestDataForDb);
       setStatus(APP_STATUS.PERSISTING_ON_CHAIN);
       setRequestData(request.getData());
       const confirmedRequestData = await request.waitForConfirmation();
       notification.remove(nofiticationIdPersisting);
       notification.success(" Request confirmed");
       setStatus(APP_STATUS.REQUEST_CONFIRMED);
-      setRequestDataProps(request);
-      setRequestData(confirmedRequestData);
-
+      // setRequestDataProps(request);
+      // console.log('-----------REQUEST CONFIRMED DATA SENT TO SABLIER DB------------')
+      // requestDataForDb = confirmedRequestData;
+      // // setRequestData(requestData);
+      // console.log(requestDataForDb)
       let notificationSendTx;
       notificationSendTx = notification.loading("Sending Transaction");
 
       //PRICE VARIABLE
       if (isOneTimePayment) {
-        sendTransactionAsync({ to: address as string, value: parseUnits(singleItemPrice, 18) });
+        sendTransactionAsync({ to: address as string, value: parseUnits(price, 18) });
       }
 
       notification.remove(notificationSendTx);
@@ -161,13 +223,34 @@ export default function Page({ params }: { params: { creator: string } }) {
       if (!isLoading && !isError) {
         let notificationLoadingDeclaring;
         notificationLoadingDeclaring = notification.loading("Declaring sent payment");
-        notification.remove(notificationLoadingDeclaring);
 
-        await request.declareSentPayment(parseEther(singleItemPrice).toString(), "sent payment", {
-          type: "ethereumAddress" as any,
-          value: address as string,
-        });
-        notification.success("Payment declared successfully");
+        try {
+          // const price = isOneTimePayment ? price : subscriptionPriceForRequest;
+          await request.declareSentPayment(parseEther(price).toString(), "sent payment", {
+            type: "ethereumAddress" as any,
+            value: address as string,
+          });
+        } catch (e) {
+          notification.error("Error to declare");
+        }
+
+        try {
+          if (isOneTimePayment === true) {
+            postRequestIdCreator(params.creator, request.requestId, true, 100, itemId);
+            postRequestIdFan(address as string, request.requestId, true, 100, itemId);
+            notification.remove(notificationLoadingDeclaring);
+            notification.success("Payment declared successfully");
+          } else {
+            console.log("Subscription payment");
+            postRequestIdFan(address as string, request.requestId, false, streamId, itemId);
+            postRequestIdCreator(params.creator, request.requestId, false, streamId, itemId);
+            notification.remove(notificationLoadingDeclaring);
+            notification.success("Payment declared successfully");
+            router.push(`/audiencehub/creator-content/${params.creator}`);
+          }
+        } catch (e) {
+          notification.error("Error to db");
+        }
       }
     } catch (err) {
       alert("Error occurred");
@@ -197,13 +280,6 @@ export default function Page({ params }: { params: { creator: string } }) {
 
   // check for NFT STREAM SENDER as USER ownership
 
-  const { data: isOwner } = useScaffoldContractRead({
-    contractName: "Sablier",
-    functionName: "getSender",
-    args: [streamId],
-    watch: true,
-  });
-
   //create stream
   const { writeAsync, isMining } = useScaffoldContractWrite({
     contractName: "Sablier",
@@ -213,7 +289,7 @@ export default function Page({ params }: { params: { creator: string } }) {
       [
         address,
         "0x64336a17003cDCcde3cebEcff1CDEc2f9AeEdB7d",
-        subscriptionPrice,
+        parseUnits(subscriptionPriceForRequest, 18),
         "0x776b6fC2eD15D6Bb5Fc32e0c89DE68683118c62A",
         true,
         true,
@@ -229,7 +305,6 @@ export default function Page({ params }: { params: { creator: string } }) {
       console.log("Settled", { data, error });
     },
     onSuccess: data => {
-      createRequest(`Subscription to ${params.creator}`, false);
       console.log("Success", data);
     },
   });
@@ -242,24 +317,18 @@ export default function Page({ params }: { params: { creator: string } }) {
     // Parameters emitted by the event can be destructed using the below example
     // for this example: event GreetingChange(address greetingSetter, string newGreeting, bool premium, uint256 value);
     listener: logs => {
+      console.log("Listener");
+      console.log(logs);
       logs.map(log => {
         const args = log.args;
         const sender = log.args[0];
         if (sender === address) {
           var StreamIdString = parseFloat(log.args[3] as string); // or parseInt(str) if you want an integer
+          const streamIdStringToDb = StreamIdString.toString();
+          console.log("------DATA SENT TO DB------");
+          console.log([params.creator, requestIdState, streamIdStringToDb, false]);
 
-          setStreamId(StreamIdString);
-          setStreamOwner(address);
-
-          console.log("Sender", true);
-
-          //post stream id here in database
-
-          //redirect to creatorpage
-          notification.success("Subscription created, redirecting to creator content");
-
-          //replace with new url on deployment
-          router.push(`http://localhost:3000/audiencehub/creator-content/${params.creator}`);
+          createRequest("Subscription", false, streamIdStringToDb, "subscriptiion", creatorDataState.price);
 
           //we check if they are subscriberd, if yes show if no dont show
         }
@@ -275,14 +344,18 @@ export default function Page({ params }: { params: { creator: string } }) {
       <div className="grid grid-cols-1 items-center align-middle mt-12 justify-items-center">
         <div className="avatar flex justify-center">
           <div className="w-24 mask mask-hexagon">
-            <img src="https://daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg" />
+            {/* //@ts-ignore */}
+            {creatorDataState ? <img src={creatorDataState.imgUrl} /> : <div>Loading</div>}
           </div>
         </div>
-        <div className="flex justify-center mt-5 font-bold">{params.creator} </div>
+        {/* //@ts-ignore */}
+        <div className="flex justify-center mt-5 font-bold">
+          {creatorDataState ? creatorDataState.name : params.creator}{" "}
+        </div>
 
         {streamOwner !== false && (
           <div>
-            {connectedAddressCounter && connectedAddressCounter > subscriptionPrice ? (
+            {connectedAddressCounter && creatorDataState.price && connectedAddressCounter > creatorDataState.price ? (
               //Subscribe button Sablier
               <button
                 className="btn btn-wide flex justify-center mt-2 btn-primary text-white text-xl"
@@ -309,12 +382,24 @@ export default function Page({ params }: { params: { creator: string } }) {
 
         <div className="grid grid-cols-1 items-center align-middle">
           <div className="flex justify-center mt-5 font-bold">Merch & Items </div>
+
           <div className="grid grid-cols-4 space-x-auto  mt-5">
             {/* //.map, with fetched data, price, image, name, description  */}
-            <ShopItem createRequest={createRequest} />
-            <ShopItem createRequest={createRequest} />
-            <ShopItem createRequest={createRequest} />
-            <ShopItem createRequest={createRequest} />
+
+            {creatorItemsState ? (
+              creatorItemsState.map((item: any, key: any) => (
+                <ShopItem
+                  createRequest={createRequest}
+                  image={item.imgUrl}
+                  description={item.description}
+                  title={item.title}
+                  price={item.price}
+                  itemId={item.id}
+                />
+              ))
+            ) : (
+              <div>Loading</div>
+            )}
           </div>
         </div>
       </div>

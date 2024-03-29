@@ -42,9 +42,13 @@ export function useFB() {
 
   // CREATORS
   const getCreatorData = async (address: string) => {
-    if (!db) return;
+    const app = initializeApp(firebaseConfig);
+
+    const dblocal = getFirestore(app);
+
+    if (!dblocal) return;
     try {
-      const docRef = doc(db, "creators", address);
+      const docRef = doc(dblocal, "creators", address);
       const docSnap = await getDoc(docRef);
 
       if (docSnap.exists()) {
@@ -177,9 +181,14 @@ export function useFB() {
   };
 
   const getItems = async (address: string) => {
-    if (!db) return;
+    const app = initializeApp(firebaseConfig);
+
+    const dblocal = getFirestore(app);
+
+    console.log("db");
+    if (!dblocal) return;
     console.log("getItems");
-    const contentsRef = collection(db, "items");
+    const contentsRef = collection(dblocal, "items");
 
     const q = query(contentsRef, where("creator", "==", address));
 
@@ -188,7 +197,8 @@ export function useFB() {
     querySnapshot.forEach(doc => {
       // doc.data() is never undefined for query doc snapshots
       // console.log(doc.id, " => ", doc.data());
-      contents.push(doc.data());
+      console.log(doc.data());
+      contents.push({ id: doc.id, ...doc.data() });
     });
     return contents;
   };
@@ -220,6 +230,75 @@ export function useFB() {
     return requests;
   };
 
+  // const postSablierId = async(address: string, sablierId: string) => {
+  //   if (!db) return;
+  //   await setDoc(doc(db, "creator_requestids_sablierids", address, "sablierids",sablierId), {
+  //     sablierId: sablierId,
+  //   })
+  // }
+
+  const postRequestIdCreator = async (
+    address: string,
+    requestid: string,
+    isOneTimePayment?: boolean,
+    sablierId?: any,
+    itemId?: any,
+  ) => {
+    if (!db) return;
+    if (isOneTimePayment === true) {
+      try {
+        await setDoc(doc(db, "creator_requestids", address, "requestids", requestid), {
+          requestid: requestid,
+          isOneTimePayment: isOneTimePayment,
+          itemId: itemId,
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    } else {
+      try {
+        await setDoc(doc(db, "creator_requestids", address, "requestids", requestid), {
+          requestid: requestid,
+          isOneTimePayment: isOneTimePayment,
+          sablierId: sablierId,
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+
+  const postRequestIdFan = async (
+    address: string,
+    requestid: string,
+    isOneTimePayment?: boolean,
+    sablierId?: any,
+    itemId?: string,
+  ) => {
+    if (!db) return;
+    if (isOneTimePayment === true) {
+      try {
+        await setDoc(doc(db, "fan_requestids", address, "requestids", requestid), {
+          requestid: requestid,
+          isOneTimePayment: isOneTimePayment,
+          itemId: itemId,
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    } else {
+      try {
+        await setDoc(doc(db, "fan_requestids", address, "requestids", requestid), {
+          requestid: requestid,
+          isOneTimePayment: isOneTimePayment,
+          sablierId: sablierId,
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+
   return {
     db,
     storage,
@@ -239,5 +318,7 @@ export function useFB() {
     uploadImages,
 
     getStreamingRequests,
+    postRequestIdFan,
+    postRequestIdCreator,
   };
 }
