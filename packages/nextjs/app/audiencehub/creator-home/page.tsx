@@ -1,14 +1,16 @@
 "use client";
 
 import React, { useState } from "react";
-// import { useAccount } from "wagmi";
+import { useAccount } from "wagmi";
 import ContentTab from "~~/components/ContentTab";
 import CreatorInfo from "~~/components/CreatorInfo";
+import ItemsTab from "~~/components/ItemsTab";
+import DashboardCreator from "~~/components/dashboard/DashboardCreator";
 
 export default function Page() {
   const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
+  const { address } = useAccount();
 
-  console.log({activeTabIndex});
   return (
     <div className="py-5 px-2">
       <CreatorInfo />
@@ -25,7 +27,7 @@ export default function Page() {
           />
           {activeTabIndex === 0 && (
             <div role="tabpanel" className="tab-content bg-base-100 border-base-300 rounded-box p-6">
-              Dashboard
+              <DashboardCreator addressOfUser={address} />
             </div>
           )}
         </React.Fragment>
@@ -59,7 +61,7 @@ export default function Page() {
           />
           {activeTabIndex === 2 && (
             <div role="tabpanel" className="tab-content bg-base-100 border-base-300 rounded-box p-6">
-              Items
+              <ItemsTab />
             </div>
           )}
         </React.Fragment>

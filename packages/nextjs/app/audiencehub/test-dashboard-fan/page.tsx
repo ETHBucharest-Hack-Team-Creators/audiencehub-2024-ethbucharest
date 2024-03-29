@@ -1,6 +1,6 @@
 import React from 'react'
 import { useAccount } from 'wagmi'
-import Dashboard from '~~/components/dashboard/Dashboard'
+import DashBoardFan from '~~/components/dashboard/DashBoardFan'
 
 const Page = () => {
 
@@ -8,7 +8,7 @@ const Page = () => {
 
   return (
     <div>
-        <Dashboard  />
+        <DashBoardFan  />
     </div>
   )
 }
