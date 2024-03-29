@@ -155,7 +155,7 @@ export default function Page({ params }: { params: { creator: string } }) {
           network: "sepolia",
         },
         //PRICE VARIABLE
-        expectedAmount: isOneTimePayment ? parseEther(price).toString() : parseEther(price).toString(),
+        expectedAmount: isOneTimePayment ? parseEther(price).toString() : "1",
         payee: {
           type: Types.Identity.TYPE.ETHEREUM_ADDRESS,
           value: address as string,
@@ -230,8 +230,8 @@ export default function Page({ params }: { params: { creator: string } }) {
         notificationLoadingDeclaring = notification.loading("Declaring sent payment");
 
         try {
-          // const price = isOneTimePayment ? price : subscriptionPriceForRequest;
-          await request.declareSentPayment(parseEther(price).toString(), "sent payment", {
+          const pricedeclare = isOneTimePayment ? price : subscriptionPriceForRequest;
+          await request.declareSentPayment(parseEther(pricedeclare).toString(), "sent payment", {
             type: "ethereumAddress" as any,
             value: address as string,
           });
@@ -360,7 +360,7 @@ export default function Page({ params }: { params: { creator: string } }) {
 
         {streamOwner !== false && (
           <div>
-            {connectedAddressCounter && creatorDataState.price && connectedAddressCounter  > creatorDataState.price ? (
+            {true ? (
               //Subscribe button Sablier
               <button
                 className="btn btn-wide flex justify-center mt-2 btn-primary text-white text-xl"
