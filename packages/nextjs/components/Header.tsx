@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useCallback, useRef, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Bars3Icon } from "@heroicons/react/24/outline";
@@ -98,12 +97,8 @@ export const Header = () => {
           )}
         </div>
         <Link href="/" passHref className="hidden lg:flex items-center gap-2 ml-4 mr-6 shrink-0">
-          <div className="flex relative w-10 h-10">
-            <Image alt="SE2 logo" className="cursor-pointer" fill src="/logo.svg" />
-          </div>
-          <div className="flex flex-col">
+          <div className="flex flex-col h-12 justify-center">
             <span className="font-bold leading-tight">Audience Hub</span>
-            <span className="text-xs"></span>
           </div>
         </Link>
         <ul className="hidden lg:flex lg:flex-nowrap menu menu-horizontal px-1 gap-2">
@@ -111,12 +106,16 @@ export const Header = () => {
         </ul>
       </div>
       {pathname === "/" ? (
-        <div className="navbar-end flex-grow mr-4">
-          <button className="btn btn-primary btn-sm" type="button" onClick={() => push("/audiencehub")}>
-            Launch App
-            <RocketLaunchIcon className="w-5 h-5 ml-1" />
-          </button>
-        </div>
+        <button
+          className="btn btn-primary btn-sm"
+          type="button"
+          onClick={() => {
+            window.location.href = "/audiencehub";
+          }}
+        >
+          Launch App
+          <RocketLaunchIcon className="w-5 h-5 ml-1" />
+        </button>
       ) : (
         <div className="navbar-end flex-grow mr-4">
           <RainbowKitCustomConnectButton />
