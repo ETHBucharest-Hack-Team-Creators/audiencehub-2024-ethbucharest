@@ -3,8 +3,14 @@
 import Image from "next/image";
 import type { NextPage } from "next";
 import { BanknotesIcon, MagnifyingGlassIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
+import { useNetwork } from "wagmi";
+import { useEffect } from "react";
 
 const Home: NextPage = () => {
+
+  const {chain, chains} = useNetwork();
+
+
   const images = [
     { src: "/sponsors/sablier.png", alt: "sablier image" },
     { src: "/sponsors/request.png", alt: "request image" },

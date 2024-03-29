@@ -9,7 +9,7 @@ import { providers } from "ethers";
 import { parseEther, parseUnits, zeroAddress } from "viem";
 import { getTransactionReceipt } from "viem/_types/actions/public/getTransactionReceipt";
 import { waitForTransactionReceipt } from "viem/_types/actions/public/waitForTransactionReceipt";
-import { useAccount, useWaitForTransaction } from "wagmi";
+import { useAccount, useNetwork, useWaitForTransaction } from "wagmi";
 import { useWalletClient } from "wagmi";
 import { useSendTransaction } from "wagmi";
 import ApproveToken from "~~/components/ApproveToken";
@@ -21,6 +21,7 @@ import { storageChains } from "~~/config/storage-chains";
 import { useScaffoldContractRead, useScaffoldContractWrite, useScaffoldEventSubscriber } from "~~/hooks/scaffold-eth";
 import { useFB } from "~~/hooks/useFB";
 import { notification } from "~~/utils/scaffold-eth";
+import chainsConfig from "~~/config/chainsConfig";
 
 export default function Page({ params }: { params: { creator: string } }) {
   //HANDLE BUTTON PAY SUBSCRIPTION
@@ -31,6 +32,7 @@ export default function Page({ params }: { params: { creator: string } }) {
   const [streamOwner, setStreamOwner] = useState("") as any;
   const [isStreamOwner, setIsStreamOnwer] = useState(false) as any;
   const [requestDataProps, setRequestDataProps] = useState();
+  const {chain, chains} = useNetwork();
 
   const router = useRouter() as any;
 
@@ -154,7 +156,8 @@ export default function Page({ params }: { params: { creator: string } }) {
       requestInfo: {
         currency: {
           type:  Types.RequestLogic.CURRENCY.ERC20,
-          value: "0x776b6fC2eD15D6Bb5Fc32e0c89DE68683118c62A",
+          //@ts-ignore
+          value: chainsConfig[chain.id].tokenContract,
           network: "sepolia",
         },
         //PRICE VARIABLE
@@ -282,15 +285,19 @@ export default function Page({ params }: { params: { creator: string } }) {
     console.log(params);
   }, []);
 
-  const sablier_Address = "0x7a43F8a888fa15e68C103E18b0439Eb1e98E4301";
+  //@ts-ignore
+
+  // const sablier_Address = "0x776b6fC2eD15D6Bb5Fc32e0c89DE68683118c62A";
 
   //check for allownce of dai
-  const { data: connectedAddressCounter } = useScaffoldContractRead({
-    contractName: "DAI",
-    functionName: "allowance",
-    args: [address, sablier_Address],
-    watch: true,
-  });
+
+
+  // const { data: connectedAddressCounter } = useScaffoldContractRead({
+  //   contractName: "DAI",
+  //   functionName: "allowance",
+  //   args: [address, sablier_Address],
+  //   watch: true,
+  // });
 
   // check for NFT STREAM SENDER as USER ownership
 
@@ -302,9 +309,10 @@ export default function Page({ params }: { params: { creator: string } }) {
     args: [
       [
         address,
-        "0x64336a17003cDCcde3cebEcff1CDEc2f9AeEdB7d",
+        params.creator,
         creatorDataState.price ? parseUnits(String(creatorDataState.price), 18) : parseUnits("1", 18),
-        "0x776b6fC2eD15D6Bb5Fc32e0c89DE68683118c62A",
+
+        chainsConfig[chain?.id].tokenContract,
         true,
         true,
         [0, 2592000],

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useAccount } from "wagmi";
 import { StarIcon } from "@heroicons/react/24/outline";
 import { useFB } from "~~/hooks/useFB";
-
+import { useNetwork } from "wagmi";
 type Creator = {
   name: string;
   description: string;
@@ -19,6 +19,11 @@ const Page = () => {
   const { getCreators } = useFB();
   const [creators, setCreators] = useState<Creator[]>([]);
   const { address } = useAccount();
+  const {chain, chains} = useNetwork()
+
+useEffect(() => {
+console.log(chain)
+},[chain])
 
   useEffect(() => {
     const fetchCreators = async () => {
@@ -31,6 +36,8 @@ const Page = () => {
     };
     fetchCreators();
   }, [address]);
+
+
 
   return (
     <div className="flex flex-col px-12 pt-4">
