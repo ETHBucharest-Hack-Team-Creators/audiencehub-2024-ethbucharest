@@ -125,7 +125,7 @@ export default function Page({ params }: { params: { creator: string } }) {
   const subscriptionPriceForRequest: string = "1";
   const subscriptionPrice = parseUnits(subscriptionPriceForRequest, 18);
 
-  const payeeIdentity = address as string;
+  const payeeIdentity = params.creator;
   const payerIdentity = address;
   const paymentRecipient = payeeIdentity;
   const feeRecipient = "0x0000000000000000000000000000000000000000";
@@ -301,7 +301,7 @@ export default function Page({ params }: { params: { creator: string } }) {
     args: [
       [
         address,
-        "0x64336a17003cDCcde3cebEcff1CDEc2f9AeEdB7d",
+        params.creator,
         creatorDataState.price ? parseUnits(String(creatorDataState.price), 18) : parseUnits("1", 18),
         "0x776b6fC2eD15D6Bb5Fc32e0c89DE68683118c62A",
         true,

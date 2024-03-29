@@ -119,7 +119,7 @@ const DashboardCreator = ({ addressOfUser }: any) => {
       loadingNotif = notification.loading("Declaring payment received");
       await request.declareReceivedPayment(amount, "sent payment", {
         type: "ethereumAddress" as any,
-        value: addressValue as string,
+        value: address as string,
       });
 
       notification.remove(loadingNotif);
