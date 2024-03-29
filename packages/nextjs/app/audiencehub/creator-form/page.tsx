@@ -17,6 +17,10 @@ const Page = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (bio && bio.length > 200) {
+      alert("Bio must be shorter than 200 letters!");
+      return;
+    }
     if (subscriptionPrice <= 0 || !subscriptionPrice) {
       alert("Subscription price must be greater than 0!");
       return;
@@ -43,7 +47,7 @@ const Page = () => {
       try {
         postCreator(address, propicURL[0], bannerURL[0], name, bio, subscriptionPrice);
         alert("Profile created successfully!");
-        window.location.reload();
+        //window.location.reload();
       } catch (e) {
         console.error(e);
       }

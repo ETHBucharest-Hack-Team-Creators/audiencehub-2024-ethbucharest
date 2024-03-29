@@ -98,8 +98,6 @@ export function useFB() {
   };
 
   const getCreators = async () => {
-    console.log("getCreators start");
-
     if (!db) return;
     console.log("getCreators");
     const creatorsRef = collection(db, "creators");
