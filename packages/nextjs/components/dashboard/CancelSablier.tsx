@@ -15,7 +15,12 @@ const CancelSablier = ({streamId}: any) => {
   }, [streamId])
 
 
-  
+  const { data: statusOf } = useScaffoldContractRead({
+    contractName: "Sablier",
+    functionName: "statusOf",
+    args: [streamId],
+  });
+
   const { writeAsync, isMining } = useScaffoldContractWrite({
     contractName: "Sablier",
     functionName: "cancel",
@@ -38,9 +43,16 @@ const CancelSablier = ({streamId}: any) => {
 
   return (
     <td>
-      <button className="btn btn-sm" onClick={() => writeAsync()} >
+
+      {statusOf === 1 &&    <button className="btn btn-sm" onClick={() => writeAsync()} >
         Cancel Subscription
+      </button> }
+      {
+        statusOf === 3 &&    <button className="btn btn-sm" onClick={() => writeAsync()} >
+        Canceled
       </button>
+      }
+    
     </td>
   );
 };
