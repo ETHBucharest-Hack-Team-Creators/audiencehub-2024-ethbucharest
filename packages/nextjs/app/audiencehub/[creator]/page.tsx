@@ -393,14 +393,16 @@ export default function Page({ params }: { params: { creator: string } }) {
 
             {creatorItemsState ? (
               creatorItemsState.map((item: any, key: any) => (
-                <ShopItem
-                  createRequest={createRequest}
-                  image={item.imgUrl}
-                  description={item.description}
-                  title={item.title}
-                  price={item.price}
-                  itemId={item.id}
-                />
+                <div key={key}>
+                  <ShopItem
+                    createRequest={createRequest}
+                    image={item.imgUrl}
+                    description={item.description}
+                    title={item.title}
+                    price={item.price}
+                    itemId={item.id}
+                  />
+                </div>
               ))
             ) : (
               <div>Loading</div>
