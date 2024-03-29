@@ -403,6 +403,7 @@ export default function Page({ params }: { params: { creator: string } }) {
             {creatorItemsState ? (
               creatorItemsState.map((item: any, key: any) => (
                 <ShopItem
+                  key={key}
                   createRequest={createRequest}
                   image={item.imgUrl}
                   description={item.description}
