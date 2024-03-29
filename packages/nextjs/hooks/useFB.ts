@@ -213,9 +213,26 @@ export function useFB() {
 
   // REQUESTS
   const getStreamingRequests = async (address: string) => {
-    if (!db) return;
+    const dbLocal = db ?? getDb();
+    if (!dbLocal) return;
     console.log("getRequests");
-    const requestsRef = collection(db, "creator_requestids", address, "requestids");
+    const requestsRef = collection(dbLocal, "creator_requestids", address, "requestids");
+
+    const q = query(requestsRef, where("isOneTimePayment", "==", false));
+
+    const querySnapshot = await getDocs(q);
+    const requests: any = [];
+    querySnapshot.forEach(doc => {
+      requests.push(doc.data());
+    });
+    return requests;
+  };
+
+  const getFanSubscriptions = async (address: string) => {
+    const dbLocal = db ?? getDb();
+    if (!dbLocal) return;
+    console.log("getFunSubscriptions");
+    const requestsRef = collection(dbLocal, "fan_requestids", address, "requestids");
 
     const q = query(requestsRef, where("isOneTimePayment", "==", false));
 
@@ -335,6 +352,8 @@ export function useFB() {
     uploadImages,
 
     getStreamingRequests,
+    getFanSubscriptions,
+
     postRequestIdFan,
     postRequestIdCreator,
     getRequestCreatorIds,

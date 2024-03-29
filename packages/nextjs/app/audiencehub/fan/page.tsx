@@ -8,14 +8,14 @@ import { notification } from "~~/utils/scaffold-eth";
 
 export default function Page() {
   const { address } = useAccount();
-  const { getStreamingRequests } = useFB();
+  const { getFanSubscriptions } = useFB();
   const [requests, setRequests] = useState<any[]>([]);
 
   useEffect(() => {
     if (!address) return;
     const fetchData = async (address: string) => {
       try {
-        const requests = await getStreamingRequests(address);
+        const requests = await getFanSubscriptions(address);
         setRequests(requests);
         console.log(requests);
       } catch (error) {
