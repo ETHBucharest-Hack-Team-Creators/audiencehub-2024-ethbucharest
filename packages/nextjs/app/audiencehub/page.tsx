@@ -10,7 +10,7 @@ type Creator = {
   description: string;
   price: number;
   creator: string;
-  imgURL: string;
+  imgUrl: string;
   bannerURL: string;
 };
 
@@ -43,26 +43,44 @@ const Page = () => {
           creators.map((creator, index) => (
             <div key={index} className="flex flex-row items-center overflow-x-aut shadow-lg rounded-lg">
               <div className="flex-none" style={{ position: "relative", width: 350, height: 165 }}>
-                <img
-                  src={creator.bannerURL}
-                  alt="creator banner"
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                  }}
-                />
+                {(() => {
+                  if (creator.bannerURL) {
+                    return (
+                      <img
+                        src={creator.bannerURL}
+                        alt="creator banner"
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                        }}
+                      />
+                    );
+                  } else {
+                    return (
+                      <img
+                        src="/images/default-banner.webp"
+                        alt="creator banner"
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                        }}
+                      />
+                    );
+                  }
+                })()}
                 <img
                   className="mask mask-hexagon"
-                  src={creator.imgURL}
+                  src={creator.imgUrl}
                   alt="creator image"
                   style={{
                     position: "absolute",
                     top: "50%",
                     left: "50%",
                     transform: "translate(-50%, -50%)",
-                    width: 90,
-                    height: 90,
+                    width: 110,
+                    height: 110,
                   }}
                 />
               </div>
