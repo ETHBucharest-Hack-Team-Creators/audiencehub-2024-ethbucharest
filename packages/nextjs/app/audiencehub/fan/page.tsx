@@ -1,10 +1,13 @@
 "use client";
 
 import React, { useState } from "react";
+import { useAccount } from "wagmi";
 import FanItemsTab from "~~/components/FanItemsTab";
 import FanSubscriptionsTab from "~~/components/FanSubscriptionsTab";
+import DashBoardFan from "~~/components/dashboard/DashBoardFan";
 
 export default function Page() {
+  const { address } = useAccount();
   // State to track the currently active tab index
   const [activeTabIndex, setActiveTabIndex] = useState<number>(1); // Default to first tab as active
 
@@ -23,7 +26,7 @@ export default function Page() {
           />
           {activeTabIndex === 1 && (
             <div role="tabpanel" className="tab-content bg-base-100 border-base-300 rounded-box p-6">
-              <p>dashboard</p>
+              <DashBoardFan addressOfUser={address} />
             </div>
           )}
         </React.Fragment>
