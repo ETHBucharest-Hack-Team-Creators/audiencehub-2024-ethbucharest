@@ -12,7 +12,7 @@ import {
   updateDoc,
   where,
 } from "firebase/firestore";
-import { type FirebaseStorage, getDownloadURL, getStorage, ref, uploadBytes  } from "firebase/storage";
+import { type FirebaseStorage, getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -60,14 +60,24 @@ export function useFB() {
     }
   };
 
-  const postCreator = async (address: string, imgUrl: string, name: string, description: string) => {
+  const postCreator = async (
+    address: string,
+    imgUrl: string,
+    bannerURL: string,
+    name: string,
+    description: string,
+    price: number,
+  ) => {
     if (!db) return;
+    console.log("post creator", address);
     try {
       await setDoc(doc(db, "creators", address), {
         creator: address,
         name,
         imgUrl,
+        bannerURL,
         description,
+        price,
       });
     } catch (error) {
       console.log(error);
@@ -84,15 +94,15 @@ export function useFB() {
   };
 
   // CONTENT
-  const postContent = async (address: string, title: string, description: string, urls: (string | undefined)[]) => {
+  const postContent = async (address: string, title: string, description: string, imgUrls: (string | undefined)[]) => {
     const id = `${address}_${Date.now()}`;
     if (!db) return;
     try {
-      await setDoc(doc(db, "creatorsContent", id), {
+      await setDoc(doc(db, "contents", id), {
         creator: address,
         title,
         description,
-        urls,
+        imgUrls,
       });
     } catch (error) {
       console.log(error);
@@ -102,7 +112,7 @@ export function useFB() {
   const getCreatorContents = async (address: string) => {
     if (!db) return;
     console.log("getContents");
-    const contentsRef = collection(db, "creatorsContent");
+    const contentsRef = collection(db, "contents");
 
     const q = query(contentsRef, where("creator", "==", address));
 
@@ -111,14 +121,14 @@ export function useFB() {
     querySnapshot.forEach(doc => {
       // doc.data() is never undefined for query doc snapshots
       // console.log(doc.id, " => ", doc.data());
-      contents.push(doc.data());
+      contents.push({ id: doc.id, ...doc.data() });
     });
     return contents;
   };
 
   const getContent = async (id: string) => {
     if (!db) return;
-    const docRef = doc(db, "creatorsContent", id);
+    const docRef = doc(db, "contents", id);
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
@@ -131,15 +141,16 @@ export function useFB() {
   };
 
   // ITEM
-  const postOneItem = async (address: string, title: string, description: string, imgUrl: string) => {
+  const postOneItem = async (address: string, title: string, description: string, price: number, imgUrl: string) => {
     console.log("postOneItem", address);
     const id = `${address}_${Date.now()}`;
     if (!db) return;
     try {
-      await setDoc(doc(db, "creatorsContent", id), {
+      await setDoc(doc(db, "items", id), {
         creator: address,
         title,
         description,
+        price,
         imgUrl,
       });
     } catch (error) {
@@ -150,7 +161,7 @@ export function useFB() {
   const getItems = async (address: string) => {
     if (!db) return;
     console.log("getItems");
-    const contentsRef = collection(db, "creatorsItem");
+    const contentsRef = collection(db, "items");
 
     const q = query(contentsRef, where("creator", "==", address));
 
@@ -167,7 +178,7 @@ export function useFB() {
   // IMAGE
   const uploadImages = async (files: File[]) => {
     const uploadPromises = files.map((file: File) => {
-      if (!storage) return;
+      if (!storage) return Promise.resolve("");
       const fileRef = ref(storage, `uploads/${file.name}`);
       return uploadBytes(fileRef, file).then(snapshot => getDownloadURL(snapshot.ref));
     });

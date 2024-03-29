@@ -67,21 +67,33 @@ export default function Page({ params }: { params: { creator: string } }) {
           id="title"
           name="title"
           placeholder="✎  Title goes here"
-          className="input input-ghost w-full max-w-xs rounded text-xl"
+          className="input input-ghost w-full max-w-xs font-medium rounded-3xl sm:text-[22px] xl:text-[22px]"
           value={formData.title}
           onChange={handleChange}
           required
         />
+        <label
+          htmlFor="description"
+          className="mb-1 mt-4 block text-lg font-medium leading-tight sm:text-[22px] xl:text-[22px]"
+        >
+          Description
+        </label>
         <textarea
           id="description"
           name="description"
           value={formData.description}
-          className="textarea textarea-bordered my-3 rounded w-full text-base"
+          className="textarea textarea-bordered my-3 w-full text-base rounded-3xl"
           placeholder="Dream it, write it"
           onChange={handleChange}
           required
         ></textarea>
         <div>
+          <label
+            htmlFor="description"
+            className="mb-1 mt-4 block text-lg font-medium leading-tight sm:text-[22px] xl:text-[22px]"
+          >
+            Select a picture for it
+          </label>
           <input
             ref={fileInputRef}
             className="file-input w-full my-3 text-sm"
@@ -111,7 +123,7 @@ export default function Page({ params }: { params: { creator: string } }) {
         </div>
 
         <button
-          className="btn btn-wide my-3 flex justify-center btn-primary text-white text-xl self-center"
+          className="btn btn-wide mt-6 my-3 flex justify-center btn-primary text-white text-xl self-center"
           type="submit"
         >
           {loading && <span className="loading loading-spinner"></span>}
