@@ -183,14 +183,11 @@ export function useFB() {
   };
 
   const getItems = async (address: string) => {
-    const app = initializeApp(firebaseConfig);
+    const dbLocal = db ?? getDb();
 
-    const dblocal = getFirestore(app);
-
-    console.log("db");
-    if (!dblocal) return;
+    if (!dbLocal) return;
     console.log("getItems");
-    const contentsRef = collection(dblocal, "items");
+    const contentsRef = collection(dbLocal, "items");
 
     const q = query(contentsRef, where("creator", "==", address));
 
@@ -199,7 +196,6 @@ export function useFB() {
     querySnapshot.forEach(doc => {
       // doc.data() is never undefined for query doc snapshots
       // console.log(doc.id, " => ", doc.data());
-      console.log(doc.data());
       contents.push({ id: doc.id, ...doc.data() });
     });
     return contents;
