@@ -10,6 +10,8 @@ import { useAccount, useWalletClient } from "wagmi";
 import { storageChains } from "~~/config/storage-chains";
 import { notification } from "~~/utils/scaffold-eth";
 import { useFB } from "~~/hooks/useFB";
+import CancelSablier from "./CancelSablier";
+import ReceiptComponent from "./ReceiptComponent";
 const Dashboard = ({addressOfUser} : any) => {
 
 
@@ -85,9 +87,11 @@ const Dashboard = ({addressOfUser} : any) => {
 
           for(let i = 0; i < itemsData.length; i++) {
             console.log(itemsData[i].requestid);
-            if(itemsData[i].oneTimePayment === true) {
+            if(itemsData[i].OneTimePayment === true || itemsData[i].isOneTimePayment) {
+              console.log(itemsData[i])
                 oneTimeItemsRequestsIds.push(itemsData[i].requestid);
-
+                
+                console.log(`Pushed ${itemsData[i].requestid} to one time payments, is one time payment : ${itemsData[i].oneTimePayment}`)
             } else {
                 subscriptionsRequestsIds.push(itemsData[i].requestid);
        
@@ -160,29 +164,58 @@ const Dashboard = ({addressOfUser} : any) => {
                       </td>
                       <td>
                         <div className="font-bold pl-1">
-                          {request.requestData.extensionsData.length > 3 &&
-                          request.requestData.extensionsData[3].action === "declareReceivedPayment"
+                          {request.requestData.extensionsData.some(
+  (data : any) => data.action === "declareReceivedPayment"
+)
                             ? "Declared"
                             : request.requestData.state}
                         </div>
                       </td>
                       <td>
                         <div className="font-bold pl-1">
-                          {request.requestData.extensionsData.length > 3 &&
-                            request.requestData.extensionsData[3].action === "declareReceivedPayment" &&
+                          { request.requestData.extensionsData.some(
+  (data : any) => data.action === "declareReceivedPayment"
+)
+                            
+                            &&
                             request.requestData.state === "created" && (
-                              <button
-                                className="btn btn-sm"
-                                onClick={() =>
-                                 alert("Receipt already signed")
-                                }
-                              >
-                                Receipt
-                              </button>
+                              <div>
+                                {/* Open the modal using document.getElementById('ID').showModal() method */}
+                                {/* //@ts-ignore */}
+                                <button className="btn" onClick={()=>document.getElementById('my_modal_1').showModal()}>Receipt</button>
+<dialog id="my_modal_1" className="modal">
+  <div className="modal-box">
+    <div><div className="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-2xl">
+           <div className="md:flex">
+             <div className="p-8">
+               <div className="uppercase tracking-wide text-sm text-indigo-500 font-semibold">Your Receipt</div>
+               <div className="mt-2 text-gray-600">
+                 <p><strong>Receipt ID:</strong> {request.requestData.requestId.slice(0,20)}...</p>
+                 <p><strong>Payer:</strong> {request.requestData.payer.value}</p>
+                 <p><strong>Payee:</strong> {request.requestData.payee.value}</p>
+                 <p><strong>Amount:</strong> ${request.requestData.expectedAmount}</p>
+               </div>
+             </div>
+           </div>
+         </div></div>
+
+    <div className="modal-action">
+
+      <form method="dialog">
+        {/* if there is a button in form, it will close the modal */}
+        <button className="btn">Close</button>
+      </form>
+    </div>
+  </div>
+</dialog>
+
+                              </div>
                             )}
 
                             {
-                              request.requestData.extensionsData.length <= 3 && request.requestData.state === "created" &&  <button
+                             request.requestData.extensionsData.some(
+                              (data : any) => data.action === "declareReceivedPayment"
+                            ) === false && request.requestData.state === "created" &&  <button
                               className="btn btn-sm"
                               onClick={() =>
                                 declarePaymentReceived(

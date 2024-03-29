@@ -115,7 +115,7 @@ export default function Page({ params }: { params: { creator: string } }) {
   useEffect(() => {}, [creatorItemsState]);
 
   //FETCH FROM DB
-  // const singleItemPrice = "0.005";
+  const singleItemPrice = "0.005";
   //FETCH FROM DB
   const subscriptionPriceForRequest: string = "1";
   const subscriptionPrice = parseUnits(subscriptionPriceForRequest, 18);
@@ -132,6 +132,9 @@ export default function Page({ params }: { params: { creator: string } }) {
     itemId?: string,
     price?: any,
   ) {
+
+    console.log("-----------PRICE------------");
+    console.log(typeof(price));
     const signatureProvider = new Web3SignatureProvider(walletClient);
     const requestClient = new RequestNetwork({
       nodeConnectionConfig: {
@@ -145,12 +148,14 @@ export default function Page({ params }: { params: { creator: string } }) {
     const requestCreateParameters: Types.ICreateRequestParameters = {
       requestInfo: {
         currency: {
-          type: isOneTimePayment ? Types.RequestLogic.CURRENCY.ETH : Types.RequestLogic.CURRENCY.ERC20,
+          type:  Types.RequestLogic.CURRENCY.ERC20,
           value: "0x776b6fC2eD15D6Bb5Fc32e0c89DE68683118c62A",
           network: "sepolia",
         },
         //PRICE VARIABLE
-        expectedAmount: isOneTimePayment ? parseEther(price).toString() : "1",
+   
+        // expectedAmount: isOneTimePayment ? price.toString() : "1",
+      expectedAmount: isOneTimePayment ? parseUnits(price.toString(), 18).toString() : "1",
         payee: {
           type: Types.Identity.TYPE.ETHEREUM_ADDRESS,
           value: address as string,
@@ -211,10 +216,10 @@ export default function Page({ params }: { params: { creator: string } }) {
       // console.log(requestDataForDb)
       let notificationSendTx;
       notificationSendTx = notification.loading("Sending Transaction");
-
+         
       //PRICE VARIABLE
       if (isOneTimePayment) {
-        sendTransactionAsync({ to: address as string, value: parseUnits(price, 18) });
+        sendTransactionAsync({ to: address as string, value: parseUnits(price.toString(), 18) });
       }
 
       notification.remove(notificationSendTx);
@@ -225,12 +230,16 @@ export default function Page({ params }: { params: { creator: string } }) {
         notificationLoadingDeclaring = notification.loading("Declaring sent payment");
 
         try {
-          const pricedeclare = isOneTimePayment ? price : subscriptionPriceForRequest;
-          await request.declareSentPayment(parseEther(pricedeclare).toString(), "sent payment", {
+          const pricedeclare = isOneTimePayment ? subscriptionPriceForRequest : subscriptionPriceForRequest;
+          console.log("----------PRICE IN DECLARATION------------")
+          console.log(pricedeclare)
+          await request.declareSentPayment(parseUnits(price.toString(), 18).toString(), "sent payment", {
             type: "ethereumAddress" as any,
             value: address as string,
           });
         } catch (e) {
+          console.log('``````````````Declaration error ```````````````')
+          console.log(e)
           notification.error("Error to declare");
         }
 
