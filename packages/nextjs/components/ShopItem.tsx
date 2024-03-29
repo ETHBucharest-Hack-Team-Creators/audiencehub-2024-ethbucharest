@@ -16,7 +16,7 @@ const ShopItem = ({ createRequest, sendTransaction, address, isTxSuccess, isTxEr
 
 
   const handleClick = async () => {
-    await createRequest();
+    await createRequest("Item bought", true);
    
  
 
