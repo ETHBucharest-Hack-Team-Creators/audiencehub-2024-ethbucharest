@@ -1,6 +1,8 @@
 import React, { useEffect } from "react";
+import { formatEther } from "viem";
 import { useAccount } from "wagmi";
 import { useScaffoldContractRead, useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
+import WithDrawRemaning from "./WithDrawRemaning";
 
 const CancelSablier = ({streamId}: any) => {
 
@@ -18,6 +20,12 @@ const CancelSablier = ({streamId}: any) => {
   const { data: statusOf } = useScaffoldContractRead({
     contractName: "Sablier",
     functionName: "statusOf",
+    args: [streamId],
+  });
+
+  const { data: withdrawAbleAmount } = useScaffoldContractRead({
+    contractName: "Sablier",
+    functionName: "withdrawableAmountOf",
     args: [streamId],
   });
 
@@ -44,14 +52,10 @@ const CancelSablier = ({streamId}: any) => {
   return (
     <td>
 
-      {statusOf === 1 &&    <button className="btn btn-sm" onClick={() => writeAsync()} >
+      {statusOf === 1 ?    <button className="btn btn-sm" onClick={() => writeAsync()} >
         Cancel Subscription
-      </button> }
-      {
-        statusOf === 3 &&    <button className="btn btn-sm" onClick={() => writeAsync()} >
-        Canceled
-      </button>
-      }
+      </button> : <p className="font-bold">Finished</p> }
+
     
     </td>
   );
