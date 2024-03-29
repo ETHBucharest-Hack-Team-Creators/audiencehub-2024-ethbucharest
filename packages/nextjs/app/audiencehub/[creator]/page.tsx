@@ -386,7 +386,7 @@ export default function Page({ params }: { params: { creator: string } }) {
         )}
 
         <div className="grid grid-cols-1 items-center align-middle">
-          <div className="flex justify-center mt-5 font-bold">Merch & Items </div>
+          <div className="flex justify-center pt-11 font-bold">Merch & Items </div>
 
           <div className="grid grid-cols-4 space-x-auto  mt-5">
             {/* //.map, with fetched data, price, image, name, description  */}
