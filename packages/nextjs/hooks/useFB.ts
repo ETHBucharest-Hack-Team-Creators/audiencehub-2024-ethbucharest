@@ -13,7 +13,6 @@ import {
   where,
 } from "firebase/firestore";
 import { type FirebaseStorage, getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
-import { get } from "http";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -214,9 +213,26 @@ export function useFB() {
 
   // REQUESTS
   const getStreamingRequests = async (address: string) => {
-    if (!db) return;
+    const dbLocal = db ?? getDb();
+    if (!dbLocal) return;
     console.log("getRequests");
-    const requestsRef = collection(db, "creator_requestids", address, "requestids");
+    const requestsRef = collection(dbLocal, "creator_requestids", address, "requestids");
+
+    const q = query(requestsRef, where("isOneTimePayment", "==", false));
+
+    const querySnapshot = await getDocs(q);
+    const requests: any = [];
+    querySnapshot.forEach(doc => {
+      requests.push(doc.data());
+    });
+    return requests;
+  };
+
+  const getFanSubscriptions = async (address: string) => {
+    const dbLocal = db ?? getDb();
+    if (!dbLocal) return;
+    console.log("getFunSubscriptions");
+    const requestsRef = collection(dbLocal, "fan_requestids", address, "requestids");
 
     const q = query(requestsRef, where("isOneTimePayment", "==", false));
 
@@ -297,26 +313,25 @@ export function useFB() {
     }
   };
 
-const getRequestCreatorIds = async (address: string) => {
-  const app = initializeApp(firebaseConfig);
-  const dblocal = getFirestore(app);
-  const requestsData: any = [];
-  // if (!dblocal) return;
-try{
-  console.log(address)
-  const querySnapshot = await getDocs(collection(dblocal, "creator_requestids", address, "requestids"));
-  querySnapshot.forEach((doc) => {
-    // doc.data() is never undefined for query doc snapshots
-    console.log(doc.id, " => ", doc.data());
-    requestsData.push({ ...doc.data() });
+  const getRequestCreatorIds = async (address: string) => {
+    const app = initializeApp(firebaseConfig);
+    const dblocal = getFirestore(app);
+    const requestsData: any = [];
+    // if (!dblocal) return;
+    try {
+      console.log(address);
+      const querySnapshot = await getDocs(collection(dblocal, "creator_requestids", address, "requestids"));
+      querySnapshot.forEach(doc => {
+        // doc.data() is never undefined for query doc snapshots
+        console.log(doc.id, " => ", doc.data());
+        requestsData.push({ ...doc.data() });
+      });
 
-  });
-
-  return requestsData;
-} catch(error) {
-console.log(error);
-}
-};
+      return requestsData;
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return {
     db,
@@ -337,6 +352,8 @@ console.log(error);
     uploadImages,
 
     getStreamingRequests,
+    getFanSubscriptions,
+
     postRequestIdFan,
     postRequestIdCreator,
     getRequestCreatorIds,
