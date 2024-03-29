@@ -17,7 +17,7 @@ import { storageChains } from "~~/config/storage-chains";
 import { useWalletClient } from "wagmi";
 import { providers } from "ethers";
 import { useSendTransaction } from "wagmi";
-import { parseUnits, zeroAddress } from 'viem';
+import { parseEther, parseUnits, zeroAddress } from 'viem';
 import { Web3SignatureProvider } from "@requestnetwork/web3-signature";
 import ShopItem from "~~/components/ShopItem";
 
@@ -32,7 +32,7 @@ export default function Page({ params }: { params: { creator: string } }) {
   const [streamOwner, setStreamOwner] = useState("") as any;
   const [isStreamOwner, setIsStreamOnwer] = useState(false) as any;
   const [requestDataProps, setRequestDataProps] = useState({} as any);
-  const price = 10000000000000000;
+
   const router = useRouter() as any;
   function delay(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -77,8 +77,9 @@ export default function Page({ params }: { params: { creator: string } }) {
 
   const {address} = useAccount()
 
-
-
+  const singleItemPrice = "0.005";
+   const subscriptionPrice = parseUnits(singleItemPrice, 18);
+  
 
 
   const payeeIdentity = address as string;
@@ -107,9 +108,9 @@ async function createRequest() {
         network: "sepolia",
       },
       //PRICE VARIABLE
-      expectedAmount: parseUnits(
-   `10`,
-        18
+      expectedAmount: parseEther(
+   singleItemPrice,
+      
       ).toString(),
       payee: {
         type: Types.Identity.TYPE.ETHEREUM_ADDRESS,
@@ -171,7 +172,7 @@ async function createRequest() {
  
 
     //PRICE VARIABLE
-    sendTransactionAsync({ to: address as string, value: parseUnits("0.0005", 18) });
+    sendTransactionAsync({ to: address as string, value: parseUnits(singleItemPrice, 18) });
      
   
    notification.remove(notificationSendTx);
@@ -184,7 +185,7 @@ async function createRequest() {
    notification.remove(notificationLoadingDeclaring);
 
 
-    await request.declareSentPayment('10', 'sent payment', {
+    await request.declareSentPayment(parseEther(singleItemPrice).toString(), 'sent payment', {
       type: "ethereumAddress" as any,
       value: address as string,
     })
@@ -242,7 +243,7 @@ useEffect(() => {
       [
         address,
         "0x64336a17003cDCcde3cebEcff1CDEc2f9AeEdB7d",
-        price,
+        subscriptionPrice,
         "0x776b6fC2eD15D6Bb5Fc32e0c89DE68683118c62A",
         true,
         true,
@@ -309,7 +310,8 @@ useEffect(() => {
 
         {streamOwner !== false && (
           <div>
-            {connectedAddressCounter && connectedAddressCounter > price ? (
+            {connectedAddressCounter && connectedAddressCounter > subscriptionPrice ? (
+              //Subscribe button Sablier
               <button
                 className="btn btn-wide flex justify-center mt-2 btn-primary text-white text-xl"
                 onClick={() => writeAsync()}
