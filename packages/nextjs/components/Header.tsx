@@ -113,7 +113,7 @@ export const Header = () => {
       </div>
       {pathname === "/" ? (
         <div className="navbar-end flex-grow mr-4">
-          <button className="btn btn-primary btn-sm" type="button" onClick={() => push("/audiencehub/explore")}>
+          <button className="btn btn-primary btn-sm" type="button" onClick={() => push("/audiencehub")}>
             Launch App
             <RocketLaunchIcon className="w-5 h-5 ml-1" />
           </button>
