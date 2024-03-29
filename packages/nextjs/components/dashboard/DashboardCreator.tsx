@@ -13,7 +13,7 @@ import { useFB } from "~~/hooks/useFB";
 import CancelSablier from "./CancelSablier";
 import ReceiptComponent from "./ReceiptComponent";
 import { formatEther, parseEther } from "viem";
-const Dashboard = ({addressOfUser} : any) => {
+const DashboardCreator = ({addressOfUser} : any) => {
 
 
       //mock array of request IDs
@@ -364,4 +364,4 @@ const Dashboard = ({addressOfUser} : any) => {
       );
 }
 
-export default Dashboard
+export default DashboardCreator
