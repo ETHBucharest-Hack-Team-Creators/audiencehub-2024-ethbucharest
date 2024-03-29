@@ -18,7 +18,7 @@ type HeaderMenuLink = {
 export const menuLinks: HeaderMenuLink[] = [
   {
     label: "Creator",
-    href: "/audiencehub/creator",
+    href: "/audiencehub/creator-home",
   },
   {
     label: "Fan",
