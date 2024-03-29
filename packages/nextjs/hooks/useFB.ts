@@ -297,6 +297,27 @@ export function useFB() {
     }
   };
 
+const getRequestCreatorIds = async (address: string) => {
+  const app = initializeApp(firebaseConfig);
+  const dblocal = getFirestore(app);
+  const requestsData: any = [];
+  // if (!dblocal) return;
+try{
+  console.log(address)
+  const querySnapshot = await getDocs(collection(dblocal, "creator_requestids", address, "requestids"));
+  querySnapshot.forEach((doc) => {
+    // doc.data() is never undefined for query doc snapshots
+    console.log(doc.id, " => ", doc.data());
+    requestsData.push({ ...doc.data() });
+
+  });
+
+  return requestsData;
+} catch(error) {
+console.log(error);
+}
+};
+
   return {
     db,
     storage,
@@ -318,5 +339,6 @@ export function useFB() {
     getStreamingRequests,
     postRequestIdFan,
     postRequestIdCreator,
+    getRequestCreatorIds,
   };
 }
