@@ -155,7 +155,7 @@ export default function Page({ params }: { params: { creator: string } }) {
         //PRICE VARIABLE
    
         // expectedAmount: isOneTimePayment ? price.toString() : "1",
-      expectedAmount: isOneTimePayment ? parseUnits(price.toString(), 18).toString() : "1",
+      expectedAmount: isOneTimePayment ? parseUnits(price.toString(), 18).toString() : String(creatorDataState.price),
         payee: {
           type: Types.Identity.TYPE.ETHEREUM_ADDRESS,
           value: address as string,
@@ -298,7 +298,7 @@ export default function Page({ params }: { params: { creator: string } }) {
       [
         address,
         "0x64336a17003cDCcde3cebEcff1CDEc2f9AeEdB7d",
-        parseUnits(subscriptionPriceForRequest, 18),
+        creatorDataState.price ? parseUnits(String(creatorDataState.price), 18) : parseUnits("1", 18),
         "0x776b6fC2eD15D6Bb5Fc32e0c89DE68683118c62A",
         true,
         true,
