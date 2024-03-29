@@ -10,6 +10,8 @@ import { useAccount, useWalletClient } from "wagmi";
 import { storageChains } from "~~/config/storage-chains";
 import { notification } from "~~/utils/scaffold-eth";
 import { useFB } from "~~/hooks/useFB";
+import CancelSablier from "./CancelSablier";
+import ReceiptComponent from "./ReceiptComponent";
 const Dashboard = ({addressOfUser} : any) => {
 
 
@@ -85,9 +87,11 @@ const Dashboard = ({addressOfUser} : any) => {
 
           for(let i = 0; i < itemsData.length; i++) {
             console.log(itemsData[i].requestid);
-            if(itemsData[i].oneTimePayment === true) {
+            if(itemsData[i].OneTimePayment === true || itemsData[i].isOneTimePayment) {
+              console.log(itemsData[i])
                 oneTimeItemsRequestsIds.push(itemsData[i].requestid);
-
+                
+                console.log(`Pushed ${itemsData[i].requestid} to one time payments, is one time payment : ${itemsData[i].oneTimePayment}`)
             } else {
                 subscriptionsRequestsIds.push(itemsData[i].requestid);
        
@@ -171,14 +175,28 @@ const Dashboard = ({addressOfUser} : any) => {
                           {request.requestData.extensionsData.length > 3 &&
                             request.requestData.extensionsData[3].action === "declareReceivedPayment" &&
                             request.requestData.state === "created" && (
-                              <button
-                                className="btn btn-sm"
-                                onClick={() =>
-                                 alert("Receipt already signed")
-                                }
-                              >
-                                Receipt
-                              </button>
+                              <div>
+                                {/* Open the modal using document.getElementById('ID').showModal() method */}
+                                {/* //@ts-ignore */}
+                                <button  className="btn btn-sm" onclick={()=>document.getElementById(`${request.requestData.requestId}`)?.showModal()} >Receipt</button>
+     
+     <dialog id={`${request.requestData.requestId}`} className="modal">
+         <div className="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-2xl">
+           <div className="md:flex">
+             <div className="p-8">
+               <div className="uppercase tracking-wide text-sm text-indigo-500 font-semibold">Your Receipt</div>
+               <div className="mt-2 text-gray-600">
+                 <p><strong>Receipt ID:</strong> {request.requestData.requestId}</p>
+                 <p><strong>Payer:</strong> {request.requestData.payer.value}</p>
+                 <p><strong>Payee:</strong> {request.requestData.payee.value}</p>
+                 <p><strong>Amount:</strong> ${request.requestData.expectedAmount}</p>
+               </div>
+             </div>
+           </div>
+         </div>
+         </dialog>
+
+                              </div>
                             )}
 
                             {
