@@ -12,7 +12,7 @@ const ItemCard = ({ item }: any) => {
         <h2 className="text-center text-xl font-bold">{item.title}</h2>
         <p className="m-2">{item.description}</p>
         <p className="m-2">{item.price}</p>
-        <p className="text-xs break-all text-left">{item.id}</p>
+        <p className="text-xs break-all text-left text-slate-300">{item.id}</p>
       </div>
     </div>
   );
