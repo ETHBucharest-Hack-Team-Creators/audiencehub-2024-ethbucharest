@@ -5,9 +5,9 @@ import { useAccount } from "wagmi";
 import { useScaffoldContractRead, useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
 
 
-const WithDrawRemaning = ({streamId, withdrawAbleAmount}: any) => {
+const WithDrawRemaning = ({streamId, withdrawAbleAmount, address}: any) => {
 
-    const {address} = useAccount();
+
     const sablier_Address = "0x7a43F8a888fa15e68C103E18b0439Eb1e98E4301";
   
   
@@ -20,10 +20,13 @@ const WithDrawRemaning = ({streamId, withdrawAbleAmount}: any) => {
   
     const { writeAsync, isMining } = useScaffoldContractWrite({
       contractName: "Sablier",
-      functionName: "withdraw",
+      functionName: "withdrawMax",
   
       args: [
-        streamId
+        streamId,
+        address,
+      
+
       ],
       blockConfirmations: 1,
       onBlockConfirmation: txnReceipt => {

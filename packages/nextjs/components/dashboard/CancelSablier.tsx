@@ -52,12 +52,10 @@ const CancelSablier = ({streamId}: any) => {
   return (
     <td>
 
-      {statusOf === 1 &&    <button className="btn btn-sm" onClick={() => writeAsync()} >
+      {statusOf === 1 ?    <button className="btn btn-sm" onClick={() => writeAsync()} >
         Cancel Subscription
-      </button> }
-      {
-        statusOf === 3 && withdrawAbleAmount > 0 &&   <WithDrawRemaning streamId={streamId} withdrawAbleAmount={withdrawAbleAmount} />
-      }
+      </button> : <p className="font-bold">Finished</p> }
+
     
     </td>
   );
