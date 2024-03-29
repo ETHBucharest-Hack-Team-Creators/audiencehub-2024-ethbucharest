@@ -98,6 +98,24 @@ export function useFB() {
     });
   };
 
+  const getCreators = async () => {
+    console.log("getCreators start");
+
+    if (!db) return;
+    console.log("getCreators");
+    const creatorsRef = collection(db, "creators");
+
+    const q = query(creatorsRef);
+
+    const querySnapshot = await getDocs(q);
+    const creators: any = [];
+    querySnapshot.forEach(doc => {
+      creators.push(doc.data());
+    });
+    console.log(creators);
+    return creators;
+  };
+
   // CONTENT
   const postContent = async (address: string, title: string, description: string, imgUrls: (string | undefined)[]) => {
     const id = `${address}_${Date.now()}`;
@@ -271,6 +289,7 @@ const postRequestIdFan = async(address: string, requestid: string, isOneTimePaym
     getCreatorData,
     postCreator,
     updateCreator,
+    getCreators,
 
     postContent,
     getCreatorContents,

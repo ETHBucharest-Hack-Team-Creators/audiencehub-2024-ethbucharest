@@ -17,12 +17,16 @@ type HeaderMenuLink = {
 
 export const menuLinks: HeaderMenuLink[] = [
   {
-    label: "Dashboard",
-    href: "/audiencehub/dashboard",
+    label: "Creator",
+    href: "/audiencehub/creator-home",
   },
   {
-    label: "Your Creator Page",
-    href: "/audiencehub/robert",
+    label: "Fan",
+    href: "/audiencehub/fan",
+  },
+  {
+    label: "Explore",
+    href: "/audiencehub",
   },
 ];
 
