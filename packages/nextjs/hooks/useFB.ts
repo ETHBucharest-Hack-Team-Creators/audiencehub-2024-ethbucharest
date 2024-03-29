@@ -93,6 +93,24 @@ export function useFB() {
     });
   };
 
+  const getCreators = async () => {
+    console.log("getCreators start");
+
+    if (!db) return;
+    console.log("getCreators");
+    const creatorsRef = collection(db, "creators");
+
+    const q = query(creatorsRef);
+
+    const querySnapshot = await getDocs(q);
+    const creators: any = [];
+    querySnapshot.forEach(doc => {
+      creators.push(doc.data());
+    });
+    console.log(creators);
+    return creators;
+  };
+
   // CONTENT
   const postContent = async (address: string, title: string, description: string, imgUrl: string) => {
     console.log("post content", address);
@@ -194,6 +212,7 @@ export function useFB() {
     getCreatorData,
     postCreator,
     updateCreator,
+    getCreators,
 
     postContent,
     getCreatorContents,

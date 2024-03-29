@@ -1,172 +1,80 @@
 "use client";
 
-import React from "react";
-import Link from "next/link";
+import React, { useEffect, useState } from "react";
+import { StarIcon } from "@heroicons/react/24/outline";
+import { useFB } from "~~/hooks/useFB";
+
+type Creator = {
+  name: string;
+  description: string;
+  creator: string;
+  imgURL: string;
+  bannerURL: string;
+};
 
 const Page = () => {
-  const [userType, setUserType] = React.useState("fan");
+  const { getCreators } = useFB();
+  const [creators, setCreators] = useState<Creator[]>([]);
+
+  useEffect(() => {
+    const fetchCreators = async () => {
+      try {
+        const creatorsData = await getCreators();
+        setCreators(creatorsData);
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    fetchCreators();
+  }, []);
+
   return (
-    <>
-      <div className="flex py-8 justify-center gap-5">
-        <button
-          className="btn btn-wide flex justify-center mt-2 btn-primary text-white text-xl"
-          onClick={() => {
-            setUserType("fan");
-          }}
-        >
-          Fan
-        </button>
-        <button
-          className="btn btn-wide flex justify-center mt-2 btn-primary text-white text-xl"
-          onClick={() => {
-            setUserType("creator");
-          }}
-        >
-          Creator
-        </button>
+    <div className="flex flex-col px-12 pt-5">
+      <div className="flex flex-row gap-3 py-8 justify-center">
+        <StarIcon className="w-10 h-10 text-yellow-500 -m-1" />
+        <h1 className="text-3xl text-center">Find new Creators</h1>
+        <StarIcon className="w-10 h-10 text-yellow-500 -m-1" />
       </div>
-      <div className="px-12 pt-5">
-        {(() => {
-          if (userType === "fan") {
-            return (
-              <div className="overflow-x-auto shadow-md">
-                <table className="table table-zebra-zebra">
-                  <tbody>
-                    {/* row 1 */}
-                    <tr>
-                      <td>
-                        <div className="flex items-center gap-3">
-                          <Link href={"/audiencehub/robert"}>
-                            <div className="avatar">
-                              <div className="mask mask-hexagon w-16 h-16">
-                                <img src="/images/pfp.jpeg" alt="Avatar Tailwind CSS Component" />
-                              </div>
-                            </div>
-                          </Link>
-                          <div>
-                            <Link href={"/audiencehub/robert"}>
-                              <div className="font-bold pl-1">Fish man</div>
-                            </Link>
-                          </div>
-                        </div>
-                      </td>
-                      <th>
-                        <button className="btn btn-sm">Close Subscription</button>
-                      </th>
-                    </tr>
-                    {/* row 2 */}
-                    <tr>
-                      <td>
-                        <div className="flex items-center gap-3">
-                          <div className="avatar">
-                            <div className="mask mask-hexagon w-16 h-16">
-                              <img src="/images/pfp.jpeg" alt="Avatar Tailwind CSS Component" />
-                            </div>
-                          </div>
-                          <div>
-                            <div className="font-bold pl-1">Fish man</div>
-                          </div>
-                        </div>
-                      </td>
-                      <th>
-                        <button className="btn btn-sm">Close Subscription</button>
-                      </th>
-                    </tr>
-                    {/* row 3 */}
-                    <tr>
-                      <td>
-                        <div className="flex items-center gap-3">
-                          <div className="avatar">
-                            <div className="mask mask-hexagon w-16 h-16">
-                              <img src="/images/pfp.jpeg" alt="Avatar Tailwind CSS Component" />
-                            </div>
-                          </div>
-                          <div>
-                            <div className="font-bold pl-1">Fish man</div>
-                          </div>
-                        </div>
-                      </td>
-                      <th>
-                        <button className="btn btn-sm">Close Subscription</button>
-                      </th>
-                    </tr>
-                    {/* row 4 */}
-                    <tr>
-                      <td>
-                        <div className="flex items-center gap-3">
-                          <div className="avatar">
-                            <div className="mask mask-hexagon w-16 h-16">
-                              <img src="/images/pfp.jpeg" alt="Avatar Tailwind CSS Component" />
-                            </div>
-                          </div>
-                          <div>
-                            <div className="font-bold pl-1">Fish man</div>
-                          </div>
-                        </div>
-                      </td>
-                      <th>
-                        <button className="btn btn-sm">Close Subscription</button>
-                      </th>
-                    </tr>
-                  </tbody>
-                </table>
+      <div className="flex flex-col gap-5">
+        {creators &&
+          creators.map((creator, index) => (
+            <div key={index} className="flex flex-row items-center overflow-x-auto shadow-md rounded-lg">
+              <div className="flex-none" style={{ position: "relative", width: 350, height: 165 }}>
+                <img
+                  src={creator.bannerURL}
+                  alt="creator banner"
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                  }}
+                />
+                <img
+                  src={creator.imgURL}
+                  alt="creator image"
+                  style={{
+                    position: "absolute",
+                    top: "50%",
+                    left: "50%",
+                    transform: "translate(-50%, -50%)",
+                    width: 70,
+                    height: 70,
+                    borderRadius: "100%",
+                  }}
+                />
               </div>
-            );
-          } else {
-            return (
-              <>
-                <div>
-                  <h1 className="text-3xl pb-4">Your Loyal Fans</h1>
-                </div>
-                <div className="overflow-x-auto shadow-md">
-                  <table className="table table-zebra-zebra">
-                    <tbody>
-                      {/* row 1 */}
-                      <tr>
-                        <td>
-                          <div className="font-bold pl-1">0x82A29547CA8970c2aDECF4C2db7e364339f9a4B7</div>
-                        </td>
-                        <td>
-                          <div className="font-bold pl-1">Closed</div>
-                        </td>
-                        <td>
-                          <div className="font-bold pl-1">
-                            <button className="btn btn-sm">Sign Receipt</button>
-                          </div>
-                        </td>
-                      </tr>
-                      {/* row 2 */}
-                      <tr>
-                        <td>
-                          <div className="font-bold pl-1">blackicon.eth</div>
-                        </td>
-                        <td>
-                          <div className="font-bold pl-1">Closed</div>
-                        </td>
-                        <td>
-                          <div className="font-bold pl-1">
-                            <button className="btn btn-sm">See Receipt</button>
-                          </div>
-                        </td>
-                      </tr>
-                      {/* row 3 */}
-                      <tr>
-                        <td>
-                          <div className="font-bold pl-1">vitalik.eth</div>
-                        </td>
-                        <td>
-                          <div className="font-bold pl-1">Expiring in 30 days</div>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </>
-            );
-          }
-        })()}
+              <div className="flex flex-1 flex-col overflow-hidden">
+                <div className="items-start text-center">Name</div>
+                <div className="text-center">{creator.name}</div>
+              </div>
+              <div className="flex flex-1 flex-col overflow-hidden">
+                <span className="items-start text-center">Description</span>
+                <span className="text-center">{creator.description}</span>
+              </div>
+            </div>
+          ))}
       </div>
-    </>
+    </div>
   );
 };
 
