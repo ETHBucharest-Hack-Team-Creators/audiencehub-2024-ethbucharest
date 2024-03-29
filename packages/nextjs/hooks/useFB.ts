@@ -119,6 +119,22 @@ export function useFB() {
     return creators;
   };
 
+  const getCreatorsByAdresses = async (creatorAddressesArray: string[]) => {
+    const dbLocal = db ?? getDb();
+
+    if (!dbLocal) return;
+    const creatorsRef = collection(dbLocal, "creators");
+
+    const q = query(creatorsRef, where("creator", "in", creatorAddressesArray));
+
+    const querySnapshot = await getDocs(q);
+    const creators: any = [];
+    querySnapshot.forEach(doc => {
+      creators.push(doc.data());
+    });
+    return creators;
+  };
+
   // CONTENT
   const postContent = async (address: string, title: string, description: string, imgUrls: (string | undefined)[]) => {
     const id = `${address}_${Date.now()}`;
@@ -185,7 +201,6 @@ export function useFB() {
     const dbLocal = db ?? getDb();
 
     if (!dbLocal) return;
-    console.log("getItems");
     const contentsRef = collection(dbLocal, "items");
 
     const q = query(contentsRef, where("creator", "==", address));
@@ -198,6 +213,40 @@ export function useFB() {
       contents.push({ id: doc.id, ...doc.data() });
     });
     return contents;
+  };
+
+  const getItemsByIds = async (docIds: string[]) => {
+    const dbLocal = db ?? getDb();
+    if (!dbLocal) return;
+    try {
+      const docRefs = docIds.map(id => doc(dbLocal, "items", id)); // Create references for each ID
+      const docPromises = docRefs.map(docRef => getDoc(docRef)); // Create a promise for each document fetch
+
+      const docSnapshots = await Promise.all(docPromises); // Fetch all documents concurrently
+
+      // Filter out non-existing documents and map to data
+      const documents = docSnapshots
+        .filter(docSnapshot => docSnapshot.exists())
+        .map(docSnapshot => ({
+          id: docSnapshot.id,
+          ...docSnapshot.data(),
+        }));
+      return documents;
+    } catch (error) {
+      console.error("Error fetching documents:", error);
+      return [];
+    }
+  };
+
+  const getFanItems = async (address: string) => {
+    const dbLocal = db ?? getDb();
+
+    if (!dbLocal) return;
+
+    const requests = await getFanItemsRequests(address);
+    const itemIds = requests.map((item: any) => item.itemId);
+    const items = await getItemsByIds(itemIds);
+    return items;
   };
 
   // IMAGE
@@ -244,6 +293,21 @@ export function useFB() {
     return requests;
   };
 
+  const getFanItemsRequests = async (address: string) => {
+    const dbLocal = db ?? getDb();
+    if (!dbLocal) return;
+    const requestsRef = collection(dbLocal, "fan_requestids", address, "requestids");
+
+    const q = query(requestsRef, where("isOneTimePayment", "==", true));
+
+    const querySnapshot = await getDocs(q);
+    const requests: any = [];
+    querySnapshot.forEach(doc => {
+      requests.push(doc.data());
+    });
+    return requests;
+  };
+
   // const postSablierId = async(address: string, sablierId: string) => {
   //   if (!db) return;
   //   await setDoc(doc(db, "creator_requestids_sablierids", address, "sablierids",sablierId), {
@@ -265,6 +329,7 @@ export function useFB() {
           requestid: requestid,
           isOneTimePayment: isOneTimePayment,
           itemId: itemId,
+          creator: address
         });
       } catch (error) {
         console.log(error);
@@ -288,6 +353,7 @@ export function useFB() {
     isOneTimePayment?: boolean,
     sablierId?: any,
     itemId?: string,
+    creatorAddress?: string
   ) => {
     if (!db) return;
     if (isOneTimePayment === true) {
@@ -296,6 +362,7 @@ export function useFB() {
           requestid: requestid,
           isOneTimePayment: isOneTimePayment,
           itemId: itemId,
+          creator: creatorAddress
         });
       } catch (error) {
         console.log(error);
@@ -362,6 +429,7 @@ console.log(error);
     postCreator,
     updateCreator,
     getCreators,
+    getCreatorsByAdresses,
 
     postContent,
     getCreatorContents,
@@ -375,6 +443,8 @@ console.log(error);
 
     getStreamingRequests,
     getFanSubscriptions,
+    getFanItemsRequests,
+    getFanItems,
 
     postRequestIdFan,
     postRequestIdCreator,
