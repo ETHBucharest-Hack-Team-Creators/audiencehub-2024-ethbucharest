@@ -43,26 +43,22 @@ export default function Page({ params }: { params: { creator: string } }) {
   interface CardProps {
     title: string;
     description: string;
-    imgUrls: string[];
+    imgUrls: string;
     id: string;
     // onClick: () => void;
   }
 
+  if (loading) return <p>Loading</p>;
+
   console.log("content list", contentList);
   return (
     <div className="md-container max-w-screen-md md:mx-auto py-5 px-2">
-      {loading ? (
-        <p>Loading...</p>
-      ) : (
-        <>
-          <h1 className="text-2xl">{creatorData.name}</h1>
-          <ul>
-            {contentList.map((item: CardProps) => (
-              <ContentCard key={item.id} title={item.title} description={item.description} imgUrls={item.imgUrls} />
-            ))}
-          </ul>
-        </>
-      )}
+      <h1 className="text-2xl">{creatorData.name}</h1>
+      <ul>
+        {contentList.map((item: CardProps) => (
+          <ContentCard key={item.id} title={item.title} description={item.description} imgUrl={item.imgUrls[0]} />
+        ))}
+      </ul>
     </div>
   );
 }

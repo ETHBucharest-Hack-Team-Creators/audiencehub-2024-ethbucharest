@@ -94,8 +94,7 @@ export function useFB() {
   };
 
   // CONTENT
-  const postContent = async (address: string, title: string, description: string, imgUrl: string) => {
-    console.log("post content", address);
+  const postContent = async (address: string, title: string, description: string, imgUrls: (string | undefined)[]) => {
     const id = `${address}_${Date.now()}`;
     if (!db) return;
     try {
@@ -103,7 +102,7 @@ export function useFB() {
         creator: address,
         title,
         description,
-        imgUrl,
+        imgUrls,
       });
     } catch (error) {
       console.log(error);
@@ -122,7 +121,7 @@ export function useFB() {
     querySnapshot.forEach(doc => {
       // doc.data() is never undefined for query doc snapshots
       // console.log(doc.id, " => ", doc.data());
-      contents.push(doc.data());
+      contents.push({ id: doc.id, ...doc.data() });
     });
     return contents;
   };
