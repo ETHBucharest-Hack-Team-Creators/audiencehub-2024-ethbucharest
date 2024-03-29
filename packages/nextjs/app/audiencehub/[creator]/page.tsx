@@ -20,6 +20,7 @@ import { useSendTransaction } from "wagmi";
 import { parseEther, parseUnits, zeroAddress } from 'viem';
 import { Web3SignatureProvider } from "@requestnetwork/web3-signature";
 import ShopItem from "~~/components/ShopItem";
+import { useFB } from "~~/hooks/useFB";
 
 export default function Page({ params }: { params: { creator: string } }) {
 
@@ -34,6 +35,12 @@ export default function Page({ params }: { params: { creator: string } }) {
   const [requestDataProps, setRequestDataProps] = useState({} as any);
 
   const router = useRouter() as any;
+
+
+  //GET ITEMS DATA FROM CREATOR
+  // items -> address ( creator ) -> items ids 
+  // display them
+
   function delay(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
@@ -71,13 +78,21 @@ export default function Page({ params }: { params: { creator: string } }) {
 
   const [requestData, setRequestData] =
     useState<Types.IRequestDataWithEvents>();
+
+    const [requestIdState, setRequestIdState] = useState('');
 //IT'S ABOUT PROVIDER
 //AMOUNT IS 10 DAI , TO MODIFY WITH PARAMETERS
 
 
-  const {address} = useAccount()
+ let requestDataForDb: any;
+
+  const {address} = useAccount();
+
+
+  const { postRequestId } = useFB();
 
   const singleItemPrice = "0.005";
+  const subscriptionPriceForRequest: string = "0.005"
    const subscriptionPrice = parseUnits(singleItemPrice, 18);
   
 
@@ -89,7 +104,7 @@ const feeRecipient = '0x0000000000000000000000000000000000000000';
 
 
 
-async function createRequest(reason: string, isOneTimePayment: boolean) {
+async function createRequest(reason: string, isOneTimePayment: boolean, streamId?: string) {
   const signatureProvider = new Web3SignatureProvider(walletClient);
   const requestClient = new RequestNetwork({
     nodeConnectionConfig: {
@@ -157,16 +172,23 @@ async function createRequest(reason: string, isOneTimePayment: boolean) {
 
   
     notification.remove(notificationId);
-   const nofiticationIdPersisting = notification.loading("  Persisting on chain")
+   const nofiticationIdPersisting: any = notification.loading("  Persisting on chain")
+   requestDataForDb = request.requestId;
+   setRequestIdState(request.requestId);
+   console.log('-----------REQUEST DATA SENT TO SABLIER DB PERSISTING ON CHAIN------------')
+   console.log(requestIdState)
+   console.log(requestDataForDb)
     setStatus(APP_STATUS.PERSISTING_ON_CHAIN);
     setRequestData(request.getData());
     const confirmedRequestData = await request.waitForConfirmation();
     notification.remove(nofiticationIdPersisting);
     notification.success(" Request confirmed")
     setStatus(APP_STATUS.REQUEST_CONFIRMED);
-    setRequestDataProps(request);
-    setRequestData(confirmedRequestData);
-    
+    // setRequestDataProps(request);
+    // console.log('-----------REQUEST CONFIRMED DATA SENT TO SABLIER DB------------')
+    // requestDataForDb = confirmedRequestData;
+    // // setRequestData(requestData);
+    // console.log(requestDataForDb)
     let notificationSendTx;
     notificationSendTx = notification.loading("Sending Transaction");
  
@@ -183,14 +205,36 @@ async function createRequest(reason: string, isOneTimePayment: boolean) {
 
    let notificationLoadingDeclaring;
    notificationLoadingDeclaring = notification.loading("Declaring sent payment");
-   notification.remove(notificationLoadingDeclaring);
 
 
-    await request.declareSentPayment(parseEther(singleItemPrice).toString(), 'sent payment', {
+    try{
+      const price = isOneTimePayment ? singleItemPrice : subscriptionPriceForRequest;
+    await request.declareSentPayment(parseEther(price).toString(), 'sent payment', {
       type: "ethereumAddress" as any,
       value: address as string,
     })
-    notification.success("Payment declared successfully")
+    
+  } catch (e) {
+    notification.error("Error to declare")
+  }
+    
+    try{
+      if(isOneTimePayment === true) {
+      postRequestId(params.creator, request.requestId, true);
+      notification.remove(notificationLoadingDeclaring);
+      notification.success("Payment declared successfully")
+      } else {
+        console.log("Subscription payment")
+        postRequestId(params.creator, request.requestId, false, streamId);
+        notification.remove(notificationLoadingDeclaring);
+        notification.success("Payment declared successfully")
+        router.push(`/audiencehub/creator-content/${params.creator}`)
+      } 
+    } catch (e) {
+      notification.error("Error to db")
+    }
+
+
   }
 
   } catch (err) {
@@ -225,13 +269,6 @@ useEffect(() => {
 
   // check for NFT STREAM SENDER as USER ownership
 
-  const { data: isOwner } = useScaffoldContractRead({
-    contractName: "Sablier",
-    functionName: "getSender",
-    args: [streamId],
-    watch: true,
-  });
-
 
 
  
@@ -264,7 +301,7 @@ useEffect(() => {
     },
     onSuccess: data => {
    
-      createRequest(`Subscription to ${params.creator}`, false);
+  
       console.log("Success", data);
     }
   });
@@ -277,26 +314,18 @@ useEffect(() => {
     // Parameters emitted by the event can be destructed using the below example
     // for this example: event GreetingChange(address greetingSetter, string newGreeting, bool premium, uint256 value);
     listener: logs => {
+      console.log("Listener");
+      console.log(logs)
       logs.map(log => {
         const args = log.args;
         const sender = log.args[0];
         if (sender === address) {
           var StreamIdString = parseFloat(log.args[3] as string); // or parseInt(str) if you want an integer
+          const streamIdStringToDb = StreamIdString.toString();
+          console.log("------DATA SENT TO DB------");
+          console.log([params.creator, requestIdState, streamIdStringToDb, false])
 
-          setStreamId(StreamIdString);
-          setStreamOwner(address);
-
-
-          console.log("Sender", true);
-
-          
-          //post stream id here in database
-
-          //redirect to creatorpage
-          notification.success("Subscription created, redirecting to creator content")
-
-          //replace with new url on deployment
-           router.push(`http://localhost:3000/audiencehub/creator-content/${params.creator}`);
+          createRequest("Subscription", false, streamIdStringToDb);
         
           //we check if they are subscriberd, if yes show if no dont show
         }
