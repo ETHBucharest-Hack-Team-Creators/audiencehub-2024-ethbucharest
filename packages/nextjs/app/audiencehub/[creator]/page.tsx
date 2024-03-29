@@ -125,7 +125,7 @@ export default function Page({ params }: { params: { creator: string } }) {
   const subscriptionPriceForRequest: string = "1";
   const subscriptionPrice = parseUnits(subscriptionPriceForRequest, 18);
 
-  const payeeIdentity = address as string;
+  const payeeIdentity = params.creator;
   const payerIdentity = address;
   const paymentRecipient = payeeIdentity;
   const feeRecipient = "0x0000000000000000000000000000000000000000";
