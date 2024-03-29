@@ -89,7 +89,7 @@ const feeRecipient = '0x0000000000000000000000000000000000000000';
 
 
 
-async function createRequest() {
+async function createRequest(reason: string, isOneTimePayment: boolean) {
   const signatureProvider = new Web3SignatureProvider(walletClient);
   const requestClient = new RequestNetwork({
     nodeConnectionConfig: {
@@ -129,10 +129,10 @@ async function createRequest() {
     },
     contentData: {
       // Consider using rnf_invoice format from @requestnetwork/data-format package.
-      reason: "bought",
+      reason: reason,
       dueDate: "12.12.2039",
-      builderId: "request-network",
-      createdWith: "CodeSandBox",
+      builderId: "audiencehub",
+
     },
     signer: {
       type: Types.Identity.TYPE.ETHEREUM_ADDRESS,
@@ -172,8 +172,9 @@ async function createRequest() {
  
 
     //PRICE VARIABLE
+    if(isOneTimePayment) {
     sendTransactionAsync({ to: address as string, value: parseUnits(singleItemPrice, 18) });
-     
+    }
   
    notification.remove(notificationSendTx);
     
@@ -253,11 +254,19 @@ useEffect(() => {
     ],
     blockConfirmations: 1,
     onBlockConfirmation: txnReceipt => {
+
       console.log("Transaction blockHash", txnReceipt.blockHash);
+
     },
     onSettled(data, error) {
+
       console.log("Settled", { data, error });
     },
+    onSuccess: data => {
+   
+      createRequest(`Subscription to ${params.creator}`, false);
+      console.log("Success", data);
+    }
   });
 
   // check for event
@@ -297,6 +306,8 @@ useEffect(() => {
       });
     },
   });
+
+
 
   return (
     <>
