@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { useAccount } from "wagmi";
+import CreatorInfo from "~~/components/CreatorInfo";
 import { useFB } from "~~/hooks/useFB";
 import { notification } from "~~/utils/scaffold-eth";
 
@@ -10,36 +11,19 @@ type TabData = {
   content: string;
 };
 
-export default function Page({ params }: { params: { creator: string } }) {
+export default function Page() {
   // const [contentList, setContentList] = useState([]);
-  const [creatorData, setCreatorData] = useState({
-    name: "",
-  });
-  const [loading, setLoading] = useState(true);
+  // const [creatorData, setCreatorData] = useState({
+  //   address: "",
+  //   imgUrl: "",
+  //   bannerURL: "",
+  //   name: "",
+  //   description: "",
+  //   price: 0,
+  // });
+  // const [loading, setLoading] = useState(true);
 
   const { address } = useAccount();
-  const { getCreatorData } = useFB();
-
-  useEffect(() => {
-    setLoading(true);
-    const fetchData = async (address: string) => {
-      try {
-        const creator = await getCreatorData(address);
-        if (creator && creator.error) {
-          notification.error(creator.error);
-          throw new Error(creator.error);
-        }
-        setCreatorData(creator);
-      } catch (error) {
-        notification.error("Something went wrong");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (!address) return;
-    fetchData(address);
-  }, [address]);
 
   const tabs: TabData[] = [
     { label: "Tab 1", content: "Tab content 1" },
@@ -47,12 +31,13 @@ export default function Page({ params }: { params: { creator: string } }) {
     { label: "Tab 3", content: "Tab content 3" },
   ];
 
-  // State to track the currently active tab index
-  const [activeTabIndex, setActiveTabIndex] = useState<number>(1); // Default to second tab as active
+  const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
+
+  // if (loading) return <p>Loading...</p>;
 
   return (
     <div className="py-5 px-2">
-      <h1 className="text-2xl">{creatorData.name}</h1>
+      <CreatorInfo />
       <div role="tablist" className="tabs tabs-lifted">
         {tabs.map((tab, index) => (
           // Fragment to group each tab input and content without adding extra nodes
