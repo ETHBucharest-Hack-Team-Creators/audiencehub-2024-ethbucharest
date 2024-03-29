@@ -64,13 +64,6 @@ export default function ItemsTab() {
             {itemsList.map((item: CardProps) => (
               <ItemCard key={item.id} item={item} />
             ))}
-
-{itemsList.map((item: CardProps) => (
-            <ItemCard key={item.id} item={item} />
-          ))}
-          {itemsList.map((item: CardProps) => (
-            <ItemCard key={item.id} item={item} />
-          ))}
           </div>
         </>
       )}
