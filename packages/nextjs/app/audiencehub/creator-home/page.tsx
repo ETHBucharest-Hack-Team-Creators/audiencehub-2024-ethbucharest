@@ -4,11 +4,12 @@ import React, { useState } from "react";
 // import { useAccount } from "wagmi";
 import ContentTab from "~~/components/ContentTab";
 import CreatorInfo from "~~/components/CreatorInfo";
+import ItemsTab from "~~/components/ItemsTab";
 
 export default function Page() {
   const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
 
-  console.log({activeTabIndex});
+  // console.log({ activeTabIndex });
   return (
     <div className="py-5 px-2">
       <CreatorInfo />
@@ -59,7 +60,7 @@ export default function Page() {
           />
           {activeTabIndex === 2 && (
             <div role="tabpanel" className="tab-content bg-base-100 border-base-300 rounded-box p-6">
-              Items
+              <ItemsTab />
             </div>
           )}
         </React.Fragment>
