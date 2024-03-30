@@ -31,7 +31,14 @@ p {
   @apply shadow-none;
 }
 
-
 .content-card:hover {
   cursor: pointer;
+}
+
+.navbar-end details.dropdownd summary {
+  color: black !important;
+}
+
+.btn.dropdown-toggle {
+  color: red !important;
 }

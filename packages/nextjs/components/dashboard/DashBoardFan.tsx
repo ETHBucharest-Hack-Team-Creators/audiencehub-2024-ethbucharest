@@ -151,7 +151,7 @@ const DashBoardFan = ({ addressOfUser }: any) => {
             {/* row 1 */}
             <tr>
               <td>
-                <div className="font-bold pl-1">Payer Address</div>
+                <div className="font-bold pl-1">Creator Address</div>
               </td>
               <td>
                 <div className="font-bold pl-1">Amount</div>
@@ -170,7 +170,7 @@ const DashBoardFan = ({ addressOfUser }: any) => {
               requestsSubscriptionsState.map((request: any, index) => (
                 <tr key={index}>
                   <td>
-                    <div className="font-bold pl-1">{request.requestData.payer.value}</div>
+                    <div className="font-bold pl-1">{request.requestData.payee.value}</div>
                   </td>
                   <td>
                     <div className="font-bold pl-1"> {request.requestData.expectedAmount}</div>
@@ -279,7 +279,7 @@ const DashBoardFan = ({ addressOfUser }: any) => {
             {/* row 1 */}
             <tr>
               <td>
-                <div className="font-bold pl-1">Payer Address</div>
+                <div className="font-bold pl-1">Creator Address</div>
               </td>
               <td>
                 <div className="font-bold pl-1">Amount</div>
@@ -295,7 +295,7 @@ const DashBoardFan = ({ addressOfUser }: any) => {
               requestsOneTimePaymentsState.map((request: any, index) => (
                 <tr key={index}>
                   <td>
-                    <div className="font-bold pl-1">{request.requestData.payer.value}</div>
+                    <div className="font-bold pl-1">{request.requestData.payee.value}</div>
                   </td>
 
                   <td>
