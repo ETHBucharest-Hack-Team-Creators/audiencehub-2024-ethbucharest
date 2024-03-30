@@ -162,7 +162,7 @@ export default function Page({ params }: { params: { creator: string } }) {
         expectedAmount: isOneTimePayment ? parseUnits(price.toString(), 18).toString() : String(creatorDataState.price),
         payee: {
           type: Types.Identity.TYPE.ETHEREUM_ADDRESS,
-          value: address as string,
+          value: params.creator
         },
         timestamp: Utils.getCurrentTimestampInSecond(),
       },

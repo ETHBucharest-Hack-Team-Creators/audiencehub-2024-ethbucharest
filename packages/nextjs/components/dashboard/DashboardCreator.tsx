@@ -299,8 +299,8 @@ const DashboardCreator = ({addressOfUser} : any) => {
   (data : any) => data.action === "declareReceivedPayment"
 )
                             
-                            &&
-                            request.requestData.state === "created" && (
+                            
+                             && (
                               <div>
                                 {/* Open the modal using document.getElementById('ID').showModal() method */}
                                 {/* //@ts-ignore */}
@@ -337,7 +337,7 @@ const DashboardCreator = ({addressOfUser} : any) => {
                             {
                                request.requestData.extensionsData.some(
                                 (data : any) => data.action === "declareReceivedPayment"
-                              ) === false && request.requestData.state === "created" &&   <button
+                              ) === false   &&   <button
                               className="btn btn-sm"
                               onClick={() =>
                                 declarePaymentReceived(
