@@ -203,11 +203,10 @@ const Home: NextPage = () => {
         <iframe
           width="650"
           height="355"
-          src="https://www.youtube.com/embed/e_N57ZGkHKg?si=78JgeCNlxSdIcxgR"
+          src="https://www.youtube.com/embed/k-ur5OKAB8Q?si=FJvxyV5PLrrY4V96"
           title="YouTube video player"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          allowFullScreen
-        ></iframe>
+        />
       </section>
     </main>
   );
