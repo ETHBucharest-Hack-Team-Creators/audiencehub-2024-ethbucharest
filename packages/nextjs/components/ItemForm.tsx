@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { useAccount } from "wagmi";
 import { CubeIcon } from "@heroicons/react/24/outline";
 import { useFB } from "~~/hooks/useFB";
+import { notification } from "~~/utils/scaffold-eth";
 
 const ItemForm = () => {
   const [title, setTitle] = useState("");
@@ -17,11 +18,11 @@ const ItemForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (price <= 0 || !price) {
-      alert("Price must be greater than 0!");
+      notification.warning("Price must be greater than 0!");
       return;
     }
     if (!title || !itemPicture) {
-      alert("Title, price and item picture are required!");
+      notification.warning("Title, price and item picture are required!");
       return;
     }
     let itemURL = [""];
@@ -33,7 +34,7 @@ const ItemForm = () => {
     if (address) {
       try {
         postOneItem(address, title, description, price, itemURL[0]);
-        alert("Item created successfully!");
+        notification.success("Item created successfully!");
       } catch (e) {
         console.error(e);
       }
