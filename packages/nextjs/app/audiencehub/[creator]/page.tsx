@@ -1,21 +1,16 @@
 "use client";
 
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { RequestNetwork, Types, Utils } from "@requestnetwork/request-client.js";
 import { Web3SignatureProvider } from "@requestnetwork/web3-signature";
-import { providers } from "ethers";
-import { parseEther, parseUnits, zeroAddress } from "viem";
-import { getTransactionReceipt } from "viem/_types/actions/public/getTransactionReceipt";
-import { waitForTransactionReceipt } from "viem/_types/actions/public/waitForTransactionReceipt";
-import { useAccount, useWaitForTransaction } from "wagmi";
+import { parseUnits, zeroAddress } from "viem";
+import { useAccount } from "wagmi";
 import { useWalletClient } from "wagmi";
 import { useSendTransaction } from "wagmi";
 import ApproveToken from "~~/components/ApproveToken";
-import { BuyNow } from "~~/components/BuyNow";
 import ShopItem from "~~/components/ShopItem";
-import { BlockieAvatar } from "~~/components/scaffold-eth";
 import { currencies } from "~~/config/currency";
 import { storageChains } from "~~/config/storage-chains";
 import { useScaffoldContractRead, useScaffoldContractWrite, useScaffoldEventSubscriber } from "~~/hooks/scaffold-eth";
@@ -76,7 +71,7 @@ export default function Page({ params }: { params: { creator: string } }) {
 
   const { address } = useAccount();
 
-  const { postRequestIdCreator, postRequestIdFan, getItems, getCreatorData } = useFB();
+  const { postRequestIdCreator, postRequestIdFan, getItems, getCreatorData, getSubscriptionId } = useFB();
   // const items =  getItems(params.creator);
 
   //GET ITEMS DATA FROM CREATOR
@@ -118,6 +113,21 @@ export default function Page({ params }: { params: { creator: string } }) {
   }, []); // Empty dependency array ensures this effect runs only once
 
   useEffect(() => {}, [creatorItemsState]);
+
+  const [alreadySubscribed, setAlreadySubscribed] = useState(false);
+  useEffect(() => {
+    const fetchSubscriptionId = async (creator: string, fan: string) => {
+      const data = await getSubscriptionId(creator, fan);
+      console.log("fetchSubscriptionStatus", data);
+      if (data && data.length > 0) {
+        setAlreadySubscribed(true);
+      }
+    };
+
+    if (!address || !params.creator) return;
+    fetchSubscriptionId(params.creator, address);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [address, params.creator]);
 
   //FETCH FROM DB
   const singleItemPrice = "0.005";
@@ -162,7 +172,7 @@ export default function Page({ params }: { params: { creator: string } }) {
         expectedAmount: isOneTimePayment ? parseUnits(price.toString(), 18).toString() : String(creatorDataState.price),
         payee: {
           type: Types.Identity.TYPE.ETHEREUM_ADDRESS,
-          value: params.creator
+          value: params.creator,
         },
         timestamp: Utils.getCurrentTimestampInSecond(),
       },
@@ -249,14 +259,14 @@ export default function Page({ params }: { params: { creator: string } }) {
 
         try {
           if (isOneTimePayment === true) {
-            postRequestIdCreator(params.creator, request.requestId, true, 100, itemId);
-            postRequestIdFan(address as string, request.requestId, true, 100, itemId, params.creator);
+            await postRequestIdCreator(params.creator, request.requestId, true, 100, itemId);
+            await postRequestIdFan(address as string, request.requestId, true, 100, itemId, params.creator);
             notification.remove(notificationLoadingDeclaring);
             notification.success("Payment declared successfully");
           } else {
             console.log("Subscription payment");
-            postRequestIdFan(address as string, request.requestId, false, streamId, itemId, params.creator);
-            postRequestIdCreator(params.creator, request.requestId, false, streamId, itemId);
+            await postRequestIdFan(address as string, request.requestId, false, streamId, itemId, params.creator);
+            await postRequestIdCreator(params.creator, request.requestId, false, streamId, itemId);
             notification.remove(notificationLoadingDeclaring);
             notification.success("Payment declared successfully");
             router.push(`/audiencehub/creator-content/${params.creator}`);
@@ -355,7 +365,7 @@ export default function Page({ params }: { params: { creator: string } }) {
   return (
     <>
       <div className="grid grid-cols-1 items-center align-middle mt-12 justify-items-center">
-        <div className="avatar flex justify-center">
+        <div className="avatar flex flex-col justify-center">
           <div className="w-24 mask mask-hexagon">
             {/* //@ts-ignore */}
             {creatorDataState ? <img src={creatorDataState.imgUrl} /> : <div>Loading</div>}
@@ -365,8 +375,9 @@ export default function Page({ params }: { params: { creator: string } }) {
         <div className="flex justify-center mt-5 font-bold">
           {creatorDataState ? creatorDataState.name : params.creator}{" "}
         </div>
+        {creatorDataState && <div>{creatorDataState.price}</div>}
 
-        {streamOwner !== false && (
+        {streamOwner !== false && !alreadySubscribed && (
           <div>
             {true ? (
               //Subscribe button Sablier
@@ -380,6 +391,14 @@ export default function Page({ params }: { params: { creator: string } }) {
               <ApproveToken />
             )}
           </div>
+        )}
+
+        {streamOwner !== false && alreadySubscribed && (
+          <Link href={`/audiencehub/creator-content/${params.creator}`} passHref>
+            <button className="btn btn-wide flex justify-center mt-2 btn-primary text-white text-xl">
+              Go to the content{" "}
+            </button>
+          </Link>
         )}
 
         {isStreamOwner && (
