@@ -26,6 +26,6 @@ As a content creator you can set up your profile, choose your prizes and monetiz
 
 This project was build at ETHBucharest 2024 by:
 
-- [AlexAstro](https://x.com/_alexastro/)
+- [alexastro](https://x.com/_alexastro/)
 - [blackicon.eth](https://x.com/TBlackicon)
-- [tatiana](https://x.com/ilge_ustun/)
+- [ilge_ustun](https://x.com/ilge_ustun/)
