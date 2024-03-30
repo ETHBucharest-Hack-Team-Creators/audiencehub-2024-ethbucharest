@@ -422,7 +422,7 @@ export function useFB() {
   }
   };
 
-  const getSubscriptionId = async (creator: string, fan: string) => {
+  const getSablierId = async (creator: string, fan: string) => {
     const dbLocal = db ?? getDb();
     if (!dbLocal) return;
     const requestsRef = collection(dbLocal, "fan_requestids", fan, "requestids");
@@ -434,7 +434,6 @@ export function useFB() {
     querySnapshot.forEach(doc => {
       requests.push(doc.data());
     });
-    console.log(requests);
     return requests;
   };
 
@@ -459,7 +458,7 @@ export function useFB() {
 
     getStreamingRequests,
     getFanSubscriptions,
-    getSubscriptionId,
+    getSablierId,
     getFanItemsRequests,
     getFanItems,
 

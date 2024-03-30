@@ -3,8 +3,11 @@
 import React, { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import ContentCard from "~~/components/ContentCard";
+import GatedContentList from "~~/components/GatedContentList";
 import { useFB } from "~~/hooks/useFB";
 import { notification } from "~~/utils/scaffold-eth";
+
+/* eslint-disable @next/next/no-img-element */
 
 type Creator = {
   name: string;
@@ -15,22 +18,15 @@ type Creator = {
   bannerURL: string;
 };
 
-interface CardProps {
-  title: string;
-  description: string;
-  imgUrls: string[];
-  id: string;
-}
-
 export default function Page({ params }: { params: { creator: string } }) {
   // Taking the creator address  and the user address
   const creatorAdress = params.creator;
   const { address } = useAccount();
 
-  const [contentList, setContentList] = useState([]);
   const [creatorData, setCreatorData] = useState<Creator>();
   const [loading, setLoading] = useState(true);
-  const { getCreatorContents, getCreatorData } = useFB();
+  const [sablierId, setSablierId] = useState();
+  const { getCreatorData, getSablierId } = useFB();
 
   useEffect(() => {
     setLoading(true);
@@ -44,8 +40,8 @@ export default function Page({ params }: { params: { creator: string } }) {
         if (creator) {
           setCreatorData(creator);
         }
-        const content = await getCreatorContents(creatorAdress);
-        setContentList(content);
+        // const content = await getCreatorContents(creatorAdress);
+        // setContentList(content);
       } catch (error) {
         notification.error("Something went wrong");
       } finally {
@@ -53,18 +49,21 @@ export default function Page({ params }: { params: { creator: string } }) {
       }
     };
 
+    const fetchSubscriptionId = async (creator: string, fan: string) => {
+      const data = await getSablierId(creator, fan);
+      console.log("fetchSubscriptionStatus", data[0]);
+      if (data && data.length > 0) {
+        setSablierId(data[0].sablierId);
+      }
+    };
+
+    if (!address || !params.creator) return;
+    fetchSubscriptionId(params.creator, address);
+
     if (!creatorAdress) return;
     fetchData(creatorAdress);
   }, [address]);
 
-  // const { data } = useScaffoldContractRead({
-  //   contractName: "Sablier",
-  //   functionName: "statusOf",
-  //   args: [],
-  //   watch: true,
-  // });
-
-  console.log("content list", contentList);
   return (
     <div className="md-container max-w-screen-lg md:mx-auto py-7">
       {loading ? (
@@ -83,11 +82,7 @@ export default function Page({ params }: { params: { creator: string } }) {
             />
             <h1 className="text-3xl">{creatorData.name}</h1>
           </div>
-          <ul>
-            {contentList.map((item: CardProps) => (
-              <ContentCard key={item.id} title={item.title} description={item.description} imgUrls={item.imgUrls} />
-            ))}
-          </ul>
+          <GatedContentList sablierId={sablierId} creatorAddress={params.creator} />
         </>
       ) : (
         <p>Creator not found!</p>
