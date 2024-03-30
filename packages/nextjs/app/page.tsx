@@ -35,11 +35,11 @@ const Home: NextPage = () => {
         <div className="w-full px-4 lg:w-5/12">
           <div className="wow fadeInUp relative z-9 mx-auto w-full max-w-[530px]" data-wow-delay=".3s">
             <Image
-              src="/images/1to1.png"
-              width="390"
-              height="750"
+              src="/images/hero.png"
+              width="500"
+              height="800"
               alt="hero image"
-              className="mx-auto max-w-full rounded-full "
+              className="mx-auto max-w-full rounded-2xl -mt-6"
             />
             <div className="max-auto absolute top-0 left-0 right-0 z-10">
               <div className="absolute top-5 right-0">
@@ -66,7 +66,7 @@ const Home: NextPage = () => {
         </div>
       </section>
 
-      <section id="sponsors" className="grid pt-[60px] pb-[25px] justify-center">
+      <section id="sponsors" className="grid pt-[60px] justify-center">
         <div className="container">
           <div className="wow fadeInUp mx-auto mb-14 max-w-[690px] text-center lg:mb-[34px]" data-wow-delay=".2s">
             <h2 className="mb-4 font-bold text-black md:text-[40px] md:leading-tight">Built with</h2>
@@ -193,7 +193,7 @@ const Home: NextPage = () => {
         </div>
       </section>
 
-      <section id="demo video" className="grid pt-[80px] pb-[50px] justify-center items-center">
+      <section id="demo video" className="grid pt-[80px] pb-[80px] justify-center items-center">
         <div className="container">
           <div className="wow fadeInUp mx-auto mb-14 max-w-[690px] text-center lg:mb-[34px]" data-wow-delay=".2s">
             <h2 className="mb-4 font-bold text-black md:text-[40px] md:leading-tight">See how it works!</h2>
