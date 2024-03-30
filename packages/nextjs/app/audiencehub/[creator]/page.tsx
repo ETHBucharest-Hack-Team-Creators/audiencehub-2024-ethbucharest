@@ -76,7 +76,7 @@ export default function Page({ params }: { params: { creator: string } }) {
 
   const { address } = useAccount();
 
-  const { postRequestIdCreator, postRequestIdFan, getItems, getCreatorData, getSubscriptionId } = useFB();
+  const { postRequestIdCreator, postRequestIdFan, getItems, getCreatorData, getSablierId } = useFB();
   // const items =  getItems(params.creator);
 
   //GET ITEMS DATA FROM CREATOR
@@ -122,7 +122,7 @@ export default function Page({ params }: { params: { creator: string } }) {
   const [alreadySubscribed, setAlreadySubscribed] = useState(false);
   useEffect(() => {
     const fetchSubscriptionId = async (creator: string, fan: string) => {
-      const data = await getSubscriptionId(creator, fan);
+      const data = await getSablierId(creator, fan);
       console.log("fetchSubscriptionStatus", data);
       if (data && data.length > 0) {
         setAlreadySubscribed(true);
