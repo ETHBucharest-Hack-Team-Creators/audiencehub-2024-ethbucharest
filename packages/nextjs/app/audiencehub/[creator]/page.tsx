@@ -163,6 +163,8 @@ export default function Page({ params }: { params: { creator: string } }) {
       requestInfo: {
         currency: {
           type: Types.RequestLogic.CURRENCY.ERC20,
+          //ON BASE SEPOLIA : 0x036CbD53842c5426634e7929541eC2318f3dCF7e
+          //ON ARBITRUM SEPOLIA : 0xf3C3351D6Bd0098EEb33ca8f830FAf2a141Ea2E1
           value: "0x776b6fC2eD15D6Bb5Fc32e0c89DE68683118c62A",
           network: "sepolia",
         },
@@ -291,6 +293,9 @@ export default function Page({ params }: { params: { creator: string } }) {
     console.log(params);
   }, []);
 
+
+ //ON BASE SEPOLIA : 0xbd7AAA2984c0a887E93c66baae222749883763d3
+ //ON ARBITRUM SEPOLIA : 0x483bdd560dE53DC20f72dC66ACdB622C5075de34
   const sablier_Address = "0x7a43F8a888fa15e68C103E18b0439Eb1e98E4301";
 
   //check for allownce of dai
