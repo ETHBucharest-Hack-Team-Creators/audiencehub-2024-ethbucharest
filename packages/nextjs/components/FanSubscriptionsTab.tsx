@@ -40,7 +40,8 @@ export default function FanSubscriptionsTab() {
     <div className="flex flex-col gap-6">
       {creators &&
         creators.map((creator, index) => (
-          <Link key={index} href={`/audiencehub/${creator.creator}`}>
+          
+          <Link key={index} href={`/audiencehub/creator-content/${creator.creator}`}>
             <div key={index} className="flex flex-row items-center overflow-x-aut shadow-lg rounded-lg">
               <div className="flex-none" style={{ position: "relative", width: 350, height: 165 }}>
                 {(() => {
