@@ -71,7 +71,7 @@ export default function Page({ params }: { params: { creator: string } }) {
 
   const { address } = useAccount();
 
-  const { postRequestIdCreator, postRequestIdFan, getItems, getCreatorData } = useFB();
+  const { postRequestIdCreator, postRequestIdFan, getItems, getCreatorData, getSubscriptionId } = useFB();
   // const items =  getItems(params.creator);
 
   //GET ITEMS DATA FROM CREATOR
@@ -113,6 +113,21 @@ export default function Page({ params }: { params: { creator: string } }) {
   }, []); // Empty dependency array ensures this effect runs only once
 
   useEffect(() => {}, [creatorItemsState]);
+
+  const [alreadySubscribed, setAlreadySubscribed] = useState(false);
+  useEffect(() => {
+    const fetchSubscriptionId = async (creator: string, fan: string) => {
+      const data = await getSubscriptionId(creator, fan);
+      console.log("fetchSubscriptionStatus", data);
+      if (data && data.length > 0) {
+        setAlreadySubscribed(true);
+      }
+    };
+
+    if (!address || !params.creator) return;
+    fetchSubscriptionId(params.creator, address);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [address, params.creator]);
 
   //FETCH FROM DB
   const singleItemPrice = "0.005";
@@ -350,7 +365,7 @@ export default function Page({ params }: { params: { creator: string } }) {
   return (
     <>
       <div className="grid grid-cols-1 items-center align-middle mt-12 justify-items-center">
-        <div className="avatar flex justify-center">
+        <div className="avatar flex flex-col justify-center">
           <div className="w-24 mask mask-hexagon">
             {/* //@ts-ignore */}
             {creatorDataState ? <img src={creatorDataState.imgUrl} /> : <div>Loading</div>}
@@ -360,8 +375,9 @@ export default function Page({ params }: { params: { creator: string } }) {
         <div className="flex justify-center mt-5 font-bold">
           {creatorDataState ? creatorDataState.name : params.creator}{" "}
         </div>
+        {creatorDataState && <div>{creatorDataState.price}</div>}
 
-        {streamOwner !== false && (
+        {streamOwner !== false && !alreadySubscribed && (
           <div>
             {true ? (
               //Subscribe button Sablier
@@ -375,6 +391,14 @@ export default function Page({ params }: { params: { creator: string } }) {
               <ApproveToken />
             )}
           </div>
+        )}
+
+        {streamOwner !== false && alreadySubscribed && (
+          <Link href={`/audiencehub/creator-content/${params.creator}`} passHref>
+            <button className="btn btn-wide flex justify-center mt-2 btn-primary text-white text-xl">
+              Go to the content{" "}
+            </button>
+          </Link>
         )}
 
         {isStreamOwner && (

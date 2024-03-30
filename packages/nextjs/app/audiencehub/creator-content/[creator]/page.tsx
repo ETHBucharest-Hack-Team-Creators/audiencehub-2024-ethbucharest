@@ -57,6 +57,13 @@ export default function Page({ params }: { params: { creator: string } }) {
     fetchData(creatorAdress);
   }, [address]);
 
+  // const { data } = useScaffoldContractRead({
+  //   contractName: "Sablier",
+  //   functionName: "statusOf",
+  //   args: [],
+  //   watch: true,
+  // });
+
   console.log("content list", contentList);
   return (
     <div className="md-container max-w-screen-lg md:mx-auto py-7">
