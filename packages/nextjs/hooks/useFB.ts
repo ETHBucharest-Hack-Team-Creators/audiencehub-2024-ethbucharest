@@ -422,6 +422,22 @@ export function useFB() {
   }
   };
 
+  const getSubscriptionId = async (creator: string, fan: string) => {
+    const dbLocal = db ?? getDb();
+    if (!dbLocal) return;
+    const requestsRef = collection(dbLocal, "fan_requestids", fan, "requestids");
+
+    const q = query(requestsRef, where("isOneTimePayment", "==", false), where("creator", "==", creator));
+
+    const querySnapshot = await getDocs(q);
+    const requests: any = [];
+    querySnapshot.forEach(doc => {
+      requests.push(doc.data());
+    });
+    console.log(requests);
+    return requests;
+  };
+
   return {
     db,
     storage,
@@ -440,16 +456,16 @@ export function useFB() {
     getItems,
 
     uploadImages,
-    
 
     getStreamingRequests,
     getFanSubscriptions,
+    getSubscriptionId,
     getFanItemsRequests,
     getFanItems,
 
     postRequestIdFan,
     postRequestIdCreator,
     getRequestCreatorIds,
-    getRequestFanIds
+    getRequestFanIds,
   };
 }
