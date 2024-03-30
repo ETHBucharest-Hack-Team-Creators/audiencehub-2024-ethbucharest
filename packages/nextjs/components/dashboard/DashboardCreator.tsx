@@ -140,7 +140,7 @@ const DashboardCreator = ({ addressOfUser }: any) => {
       </div>
 
       {/* TABLE SUBCRIPTIONS */}
-      <div className="overflow-x-auto shadow-md">
+      <div className="overflow-x-auto shadow-md rounded-2xl">
         <table className="table table-zebra-zebra">
           <tbody>
             {/* row 1 */}
@@ -261,7 +261,7 @@ const DashboardCreator = ({ addressOfUser }: any) => {
         <h1 className="text-3xl pb-4 pt-8">Accept Item Orders</h1>
       </div>
 
-      <div className="overflow-x-auto shadow-md">
+      <div className="overflow-x-auto shadow-md rounded-2xl">
         <table className="table table-zebra-zebra">
           <tbody>
             {/* row 1 */}
