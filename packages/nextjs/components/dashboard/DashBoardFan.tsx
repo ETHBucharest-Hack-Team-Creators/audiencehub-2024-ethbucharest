@@ -187,7 +187,9 @@ const DashBoardFan = ({ addressOfUser }: any) => {
                   </td>
                   <td>
                     <div className="font-bold pl-1">
-                      {request.requestData.state === "accepted" && (
+                      {request.requestData.extensionsData.some(
+                        (data: any) => data.action === "declareReceivedPayment",
+                      ) === true && (
                         <div>
                           {/* Open the modal using document.getElementById('ID').showModal() method */}
                           {/* //@ts-ignore */}
