@@ -39,7 +39,7 @@ const Avatar: React.FC<AvatarProps> = ({ imgUrl, setImgUrl, setImgFile, size = "
         onClick={handleAvatarClick}
       >
         {imgUrl ? (
-          <img src={imgUrl} alt="Avatar" className={`object-cover rounded-full ${sizeClasses[size]}`} />
+          <img src={imgUrl} alt="Avatar" className={`mask mask-hexagon object-cover ${sizeClasses[size]}`} />
         ) : (
           <div className={`flex items-center justify-center bg-gray-200 ${sizeClasses[size]}`}>
             <span className="text-sm text-gray-500">Upload Avatar</span>
