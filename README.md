@@ -20,7 +20,7 @@ As a content creator you can set up your profile, choose your prizes and monetiz
 ## Links
 
 - [Dora Hacks](https://dorahacks.io/buidl/10863#details)
-- [demo video](https://www.youtube.com/watch?v=k-ur5OKAB8Q)
+- [Demo Video](https://www.youtube.com/watch?v=k-ur5OKAB8Q)
 
 ## Team
 
