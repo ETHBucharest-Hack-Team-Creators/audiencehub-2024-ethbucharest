@@ -190,12 +190,9 @@ const DashBoardFan = ({addressOfUser} : any) => {
                       </td>
                       <td>
                         <div className="font-bold pl-1">
-                          { request.requestData.extensionsData.some(
-  (data : any) => data.action === "declareReceivedPayment"
-)
+                          { 
                             
-                            &&
-                            request.requestData.state === "created" && (
+                         request.requestData.state === "accepted" && (
                               <div>
                                 {/* Open the modal using document.getElementById('ID').showModal() method */}
                                 {/* //@ts-ignore */}
@@ -312,7 +309,7 @@ const DashBoardFan = ({addressOfUser} : any) => {
 )
                             
                             &&
-                            request.requestData.state === "created" && (
+                            request.requestData.state === "accepted" && (
                               <div>
                                 {/* Open the modal using document.getElementById('ID').showModal() method */}
                                 {/* //@ts-ignore */}
